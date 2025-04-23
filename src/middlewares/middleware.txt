@@ -1,0 +1,1 @@
+Un middleware es una función que se ejecuta entre la recepción de una petición HTTP y el controlador final que la procesa. Actúa como un "intermediario" en nuestro servidor Express.
