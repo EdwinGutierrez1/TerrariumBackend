@@ -1,10 +1,9 @@
 const authService = require('../services/auth.service');
 
 exports.login = async (req, res) => {
-  console.log("Petición de login recibida", { email: req.body.email });
   
   try {
-    const { email, password, idToken } = req.body;
+    const {idToken } = req.body;
     
     if (!idToken) {
       console.log("Error: No se proporcionó token");

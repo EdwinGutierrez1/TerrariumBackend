@@ -1,6 +1,6 @@
     const admin = require('../config/firebase.config');
 
-    exports.verifyToken = async (req, res, next) => {
+    const verifyToken = async (req, res, next) => {
     try {
         const idToken = req.headers.authorization?.split('Bearer ')[1];
         
@@ -16,3 +16,5 @@
         return res.status(401).json({ message: 'Token inválido o expirado' });
     }
     };
+
+    module.exports = verifyToken;

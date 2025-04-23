@@ -14,7 +14,7 @@ exports.verifyAndGetUserData = async (idToken) => {
     
     // Obtener datos adicionales del usuario desde Supabase
     console.log(`Consultando datos para UID ${uid} en Supabase...`);
-    const { data, error } = await supabase
+    const {data, error } = await supabase
       .from('brigadista')
       .select('nombre')
       .eq('UID', uid);

@@ -1,6 +1,6 @@
 /*Ambas funciones están relacionadas con la misma entidad "Brigadista". Por eso conviene mantenerlas en un mismo archivo */
 
-const supabase = require('../config/supabaseClient');
+const supabase = require('../config/supabase.config');
 
 // Servicio para obtener información del brigadista
 exports.getInfoBrigadista = async (uid) => {

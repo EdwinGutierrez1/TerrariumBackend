@@ -1,4 +1,4 @@
-const brigadistaService = require('../services/brigadistaService');
+const brigadistaService = require('../services/brigadista.service');
 
 // Controlador para obtener información del brigadista
 exports.getInfoBrigadista = async (req, res) => {
