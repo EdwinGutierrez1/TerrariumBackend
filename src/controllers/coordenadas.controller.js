@@ -48,7 +48,7 @@ exports.getCentroPoblado = async (req, res) => {
         }
         
         // Luego obtenemos las coordenadas usando el ID del conglomerado
-        const centroPoblado = await coordenadasService.getCentroPoblado(brigadistaInfo.idConglomerado);
+        const centroPoblado = await coordenadasService.getCentroPoblado(brigadistaInfo.brigada);
         
         return res.status(200).json({
         success: true,
