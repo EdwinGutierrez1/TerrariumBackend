@@ -1,4 +1,3 @@
-// src/services/coordenadas.service.js
 const supabase = require("../config/supabase.config");
 
 // Servicio para obtener coordenadas según el conglomerado asociado al brigadista
@@ -33,10 +32,35 @@ exports.getCoordenadasSubparcelas = async (idConglomerado) => {
       return [];
     }
 
+    // Procesamos las coordenadas para asegurar que sean valores numéricos válidos
+    const coordenadasFormateadas = data.map(coord => {
+      // Convertir latitud y longitud a números
+      let lat = typeof coord.latitud === "string" ? parseFloat(coord.latitud.replace(/[^\d.-]/g, "")) : coord.latitud;
+      let lng = typeof coord.longitud === "string" ? parseFloat(coord.longitud.replace(/[^\d.-]/g, "")) : coord.longitud;
+      
+      // Verificar que sean números válidos dentro del rango
+      if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
+        console.warn("Coordenadas inválidas encontradas:", coord);
+        return null;
+      }
+      
+      // Verificar rangos válidos
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        console.warn("Coordenadas fuera de rango:", { lat, lng });
+        return null;
+      }
+      
+      return {
+        ...coord,
+        latitud: lat,
+        longitud: lng,
+      };
+    }).filter(Boolean); // Eliminar entradas nulas
+
     console.log(
-      `✅ Se encontraron ${data.length} coordenadas para el conglomerado ${idConglomerado}`
+      `✅ Se encontraron ${coordenadasFormateadas.length} coordenadas válidas para el conglomerado ${idConglomerado}`
     );
-    return data;
+    return coordenadasFormateadas;
   } catch (err) {
     console.error("🚨 Error inesperado en getCoordenadas:", err);
     return [];
@@ -46,33 +70,36 @@ exports.getCoordenadasSubparcelas = async (idConglomerado) => {
 exports.getCentroPoblado = async (brigada) => {
   try {
     console.log(
-      "⏳ Consultando centro poblado para conglomerado:",
-      idConglomerado
+      "⏳ Consultando centro poblado para brigada:",
+      brigada
     );
 
-    if (!idConglomerado) {
-      console.error("❌ Error: ID de conglomerado no proporcionado");
-      return null;
+    if (!brigada) {
+      console.error("❌ Error: ID de brigada no proporcionado");
+      return []; 
     }
 
+    // Primero obtenemos los brigadistas asociados a esta brigada
     const { data: brigadistas, error: errorBrigadistas } = await supabase
       .from("brigadista")
       .select("cedula")
-      .in("id_brigada", brigada);
+      .eq("id_brigada", brigada);
 
     if (errorBrigadistas) {
       console.error("Error en consulta de brigadistas:", errorBrigadistas);
-      throw errorBrigadistas;
-    }
-
-    console.log("Brigadistas encontrados:", brigadistas);
-    const cedulas = brigadistas.map((b) => b.cedula);
-
-    if (cedulas.length === 0) {
-      console.log("No se encontraron cédulas de brigadistas");
       return [];
     }
 
+    console.log("Brigadistas encontrados:", brigadistas);
+    
+    if (!brigadistas || brigadistas.length === 0) {
+      console.log("No se encontraron brigadistas para esta brigada");
+      return [];
+    }
+    
+    const cedulas = brigadistas.map((b) => b.cedula);
+
+    // Consultamos los puntos de referencia tipo "Centro Poblado" asociados a esos brigadistas
     console.log("Consultando puntos con cedulas:", cedulas);
     const { data: centros, error: errorCentros } = await supabase
       .from("punto_referencia")
@@ -82,52 +109,51 @@ exports.getCentroPoblado = async (brigada) => {
 
     if (errorCentros) {
       console.error("Error en consulta de centros poblados:", errorCentros);
-      throw errorCentros;
+      return [];
     }
 
-    if (!data) {
+    if (!centros || centros.length === 0) {
       console.warn(
-        "⚠️ No se encontró centro poblado para el conglomerado:",
-        idConglomerado
+        "⚠️ No se encontraron centros poblados para la brigada:",
+        brigada
       );
-      return null;
+      return [];
     }
 
     console.log("Centros poblados encontrados:", centros);
-    console.log(`✅ Se encontró centro poblado: ${centros}`);
 
+    // Formateamos las coordenadas para asegurar que sean números válidos
     const centrosFormateados = centros
       .map((centro) => {
         try {
-          // Asegúrate de que cualquier formato de string se convierta correctamente
-          // a un número válido, incluso si contiene caracteres no numéricos
-          let lat = centro.latitud;
-          let lng = centro.longitud;
+          // Convertir a números eliminando caracteres no numéricos
+          let lat = typeof centro.latitud === "string" 
+            ? parseFloat(centro.latitud.replace(/[^\d.-]/g, "")) 
+            : parseFloat(centro.latitud);
+          
+          let lng = typeof centro.longitud === "string" 
+            ? parseFloat(centro.longitud.replace(/[^\d.-]/g, "")) 
+            : parseFloat(centro.longitud);
 
-          // Si son strings, intenta limpiarlos y convertirlos
-          if (typeof lat === "string") {
-            lat = parseFloat(lat.replace(/[^\d.-]/g, ""));
-          }
-          if (typeof lng === "string") {
-            lng = parseFloat(lng.replace(/[^\d.-]/g, ""));
-          }
-
-          // Verificación adicional para coordenadas inválidas
+          // Verificar que los valores sean números válidos
           if (isNaN(lat) || isNaN(lng) || !isFinite(lat) || !isFinite(lng)) {
             console.warn("Coordenadas inválidas encontradas:", centro);
-            return null; // Omitir este centro
+            return null;
           }
 
-          // Verificar rangos válidos para coordenadas (latitud: -90 a 90, longitud: -180 a 180)
+          // Verificar rangos válidos para coordenadas
           if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
             console.warn("Coordenadas fuera de rango:", { lat, lng });
-            return null; // Omitir este centro
+            return null;
           }
 
+          // Devolver objeto con coordenadas formateadas
           return {
             ...centro,
             latitud: lat,
             longitud: lng,
+            descripcion: centro.descripcion || "Centro Poblado",
+            tipo: centro.tipo
           };
         } catch (error) {
           console.error("Error procesando coordenadas:", error, centro);
@@ -136,11 +162,12 @@ exports.getCentroPoblado = async (brigada) => {
       })
       .filter(Boolean); // Eliminar entradas nulas
 
+    console.log(`✅ Se encontraron ${centrosFormateados.length} centros poblados válidos`);
     console.log("Centros formateados para devolver:", centrosFormateados);
     return centrosFormateados;
     
   } catch (err) {
     console.error("🚨 Error inesperado en getCentroPoblado:", err);
-    return null;
+    return [];
   }
 };
