@@ -1,0 +1,21 @@
+#Se añaden archivos con la información de las credenciales al .gitignore para evitar que cualquier persona pueda
+#tener acceso a estas, ya que la seguridad se vería comprometida.
+#Esto significa que no bastará con clonar el repositorio para que el proyecto funcione, será necesario incluir
+#denuevo estos archivos
+
+# Credenciales de Firebase
+firebase-adminsdk.json
+
+# Node modules
+node_modules/
+
+# Variables de entorno
+.env
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Directorios de dependencias
+.npm
