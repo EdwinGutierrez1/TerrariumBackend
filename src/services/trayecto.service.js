@@ -1,6 +1,6 @@
 const supabase = require('../config/supabase.config');
 
-exports.obtenerSiguienteIdTrayecto = async () => {
+const obtenerSiguienteIdTrayecto = async () => {
     try {
       // Realizamos una consulta para obtener el último ID de trayecto
       const { data, error } = await supabase
@@ -37,7 +37,7 @@ exports.obtenerSiguienteIdTrayecto = async () => {
   };
   
 
-  exports.insertarTrayecto = async (trayecto, idReferencia) => {
+  const insertarTrayecto = async (trayecto, idReferencia) => {
     try {
       const siguienteId = await obtenerSiguienteIdTrayecto();
       
@@ -62,7 +62,6 @@ exports.obtenerSiguienteIdTrayecto = async () => {
             duracion,
             distancia,
             id_punto_referencia: idReferencia,
-            cedula_brigadista
           },
         ])
         .select();
@@ -78,7 +77,7 @@ exports.obtenerSiguienteIdTrayecto = async () => {
   };
 
 
-  exports.actualizarTrayecto = async (trayecto, referenciaId) => {
+  const actualizarTrayecto = async (trayecto, referenciaId) => {
     try {
       const { medioTransporte, duracion, distancia } = trayecto;
   
@@ -104,7 +103,7 @@ exports.obtenerSiguienteIdTrayecto = async () => {
     }
   };
   
-  exports.obtenerTrayectoPorId = async (id) => {
+  const obtenerTrayectoPorId = async (id) => {
     try {
       const { data, error } = await supabase
         .from('trayecto')
@@ -128,3 +127,9 @@ exports.obtenerSiguienteIdTrayecto = async () => {
   };
 
 
+module.exports = {
+    obtenerSiguienteIdTrayecto,
+    insertarTrayecto,
+    actualizarTrayecto,
+    obtenerTrayectoPorId
+  };

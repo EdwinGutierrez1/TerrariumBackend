@@ -1,6 +1,6 @@
 // backend/controllers/trayectoController.js
-const trayectoService = require('../services/trayectoService');
-const referenciaService = require('../services/referenciaService'); // Deberás crear este servicio
+const trayectoService = require('../services/trayecto.service');
+const referenciaService = require('../services/referencia.service'); // Deberás crear este servicio
 
 exports.guardarTrayecto = async (req, res) => {
   try {
@@ -84,34 +84,28 @@ exports.actualizarTrayecto = async (req, res) => {
   }
 };
 
-/*
-exports.obtenerTrayecto = async (req, res) => {
+
+exports.obtenerIdTrayecto = async (req, res) => {
   try {
-    const { id } = req.params;
-    const trayecto = await trayectoService.obtenerTrayectoPorId(id);
+    // This should call obtenerSiguienteIdTrayecto, not obtenerTrayectoPorId
+    const siguienteId = await trayectoService.obtenerSiguienteIdTrayecto();
     
-    if (!trayecto) {
+    if (!siguienteId) {
       return res.status(404).json({
         success: false,
-        error: "Trayecto no encontrado"
+        error: "No se pudo generar el siguiente ID para el trayecto"
       });
     }
     
     return res.status(200).json({
       success: true,
-      data: trayecto
+      data: { siguienteId }
     });
   } catch (error) {
-    console.error('Error en obtenerTrayecto:', error);
+    console.error('Error en obtenerIdTrayecto:', error);
     return res.status(500).json({ 
       success: false, 
-      error: error.message || "Error al obtener el trayecto" 
+      error: error.message || "Error al obtener el siguiente ID de trayecto" 
     });
   }
 };
-
-module.exports = {
-  guardarTrayecto,
-  actualizarDatosTrayecto,
-  obtenerTrayecto
-};*/
