@@ -6,7 +6,8 @@ const dotenv = require('dotenv');
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const brigadistaRoutes = require('./routes/brigadista.routes');
-const coordenadasRoutes = require('./routes/coordenadas.routes'); // Importar rutas de coordenadas
+const coordenadasRoutes = require('./routes/coordenadas.routes');
+const referenciaRoutes = require('./routes/referencia.routes'); 
 // Importar otras rutas según necesites
 
 // Configuración
@@ -23,6 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/brigadista', brigadistaRoutes);
 app.use('/api/coordenadas', coordenadasRoutes);
+app.use('/api/referencias', referenciaRoutes);
 // Añadir otras rutas
 
 // Ruta base para verificar que el servidor está funcionando
