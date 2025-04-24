@@ -73,7 +73,7 @@ exports.updateTutorialCompletado = async (uid, completado) => {
     console.log("👤 Rol del usuario:", rol);
 
     // Verificar que el usuario sea Jefe de brigada
-    if (rol !== "Jefe de brigada" && completado === true) {
+    if (rol !== "Jefe de Brigada" && completado === true) {
       console.warn("⚠️ Solo el Jefe de brigada puede completar el tutorial para toda la brigada");
       
       // Actualizar solo el usuario actual
@@ -97,7 +97,8 @@ exports.updateTutorialCompletado = async (uid, completado) => {
     const { data, error } = await supabase
       .from('brigadista')
       .update({ tutorial_completado: completado })
-      .eq("id_brigada", idBrigada);
+      .eq("id_brigada", idBrigada)
+      .select();
 
     if (error) {
       console.error("❌ Error al hacer el update en Supabase para la brigada:", error);
