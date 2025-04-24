@@ -77,3 +77,54 @@ exports.obtenerSiguienteIdTrayecto = async () => {
     }
   };
 
+
+  exports.actualizarTrayecto = async (trayecto, referenciaId) => {
+    try {
+      const { medioTransporte, duracion, distancia } = trayecto;
+  
+      if (!medioTransporte || medioTransporte.trim() === "") {
+        throw new Error("El campo 'medio_transporte' no puede estar vacío");
+      }
+  
+      const { data, error } = await supabase
+        .from("trayecto")
+        .update({
+          medio_transporte: medioTransporte,
+          duracion,
+          distancia,
+        })
+        .eq("id_punto_referencia", referenciaId);
+  
+      if (error) throw error;
+  
+      return { success: true, data };
+    } catch (err) {
+      console.error("Error al actualizar el trayecto:", err);
+      throw err;
+    }
+  };
+  
+  exports.obtenerTrayectoPorId = async (id) => {
+    try {
+      const { data, error } = await supabase
+        .from('trayecto')
+        .select('*')
+        .eq('id', id)
+        .single();
+      
+      if (error) {
+        // Si el error es porque no encontró resultados, retornamos null
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error al obtener trayecto:', error);
+      throw error;
+    }
+  };
+
+

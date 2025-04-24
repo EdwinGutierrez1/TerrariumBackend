@@ -36,13 +36,14 @@ exports.guardarTrayecto = async (req, res) => {
   }
 };
 
-/*
-exports.actualizarDatosTrayecto = async (req, res) => {
+
+
+exports.actualizarTrayecto = async (req, res) => {
   try {
     const { datosTrayecto, puntoId } = req.body;
     const cedulaBrigadista = datosTrayecto.cedula_brigadista;
 
-    // Validar punto de referencia como primer paso
+    // Verificar que el punto de referencia pertenezca al brigadista
     const puntoReferencia = await referenciaService.obtenerReferenciaPorId(puntoId);
 
     if (!puntoReferencia) {
@@ -62,17 +63,20 @@ exports.actualizarDatosTrayecto = async (req, res) => {
     // Validar trayecto
     const trayectoExistente = await trayectoService.obtenerTrayectoPorId(datosTrayecto.idTrayecto);
     if (!trayectoExistente) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        error: "El trayecto no existe" 
+        error: "El trayecto no existe"
       });
     }
 
     const result = await trayectoService.actualizarTrayecto(datosTrayecto, puntoId);
     
-    return res.status(200).json(result);
+    return res.status(200).json({
+      success: true,
+      data: result
+    });
   } catch (error) {
-    console.error('Error en actualizarDatosTrayecto:', error);
+    console.error('Error en actualizarTrayecto:', error);
     return res.status(500).json({ 
       success: false, 
       error: error.message || "Error al actualizar el trayecto" 
@@ -80,6 +84,7 @@ exports.actualizarDatosTrayecto = async (req, res) => {
   }
 };
 
+/*
 exports.obtenerTrayecto = async (req, res) => {
   try {
     const { id } = req.params;
