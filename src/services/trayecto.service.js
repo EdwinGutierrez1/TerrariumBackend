@@ -45,7 +45,7 @@ const obtenerSiguienteIdTrayecto = async () => {
         throw new Error("No se pudo generar el siguiente ID para el trayecto");
       }
   
-      const { medioTransporte, duracion, distancia, cedula_brigadista } = trayecto;
+      const { medioTransporte, duracion, distancia } = trayecto;
   
       // Validation with the camelCase variable
       if (!medioTransporte || medioTransporte.trim() === "") {
