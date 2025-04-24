@@ -73,3 +73,39 @@ exports.actualizarReferencia = async (req, res) => {
         });
         }
 };
+
+exports.eliminarReferencia = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { cedula_brigadista } = req.body;
+        
+        if (!cedula_brigadista) {
+            return res.status(400).json({
+            success: false,
+            message: 'Se requiere la cédula del brigadista'
+            });
+        }
+        
+        const resultado = await referenciaService.eliminarReferencia(id, cedula_brigadista);
+        
+        if (resultado.success) {
+            return res.status(200).json({
+            success: true,
+            message: 'Punto de referencia eliminado correctamente',
+            data: resultado.data
+            });
+        } else {
+            return res.status(403).json({
+            success: false,
+            message: resultado.error
+            });
+        }
+        } catch (error) {
+        console.error('Error en eliminarReferencia controller:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al eliminar punto de referencia',
+            error: error.message
+        });
+        }
+};

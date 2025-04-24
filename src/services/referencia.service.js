@@ -112,3 +112,47 @@ exports.actualizarReferencia = async (puntoReferencia) => {
         return { success: false, error: error.message };
         }
 };
+
+exports.eliminarReferencia = async (puntoId, cedulaBrigadista) => {
+    try {
+      // Verificamos si el brigadista es el creador del punto
+        const { data: puntoExistente, error: errorConsulta } = await supabase
+            .from('punto_referencia')
+            .select('cedula_brigadista')
+            .eq('id', puntoId)
+            .single();
+        
+        if (errorConsulta) {
+            return { success: false, error: "Error al consultar el punto de referencia" };
+        }
+        
+        // Si el punto no existe
+        if (!puntoExistente) {
+            return { success: false, error: "El punto de referencia no existe" };
+        }
+        
+        // Si el brigadista actual no es el creador, retornamos error
+        if (puntoExistente.cedula_brigadista !== cedulaBrigadista) {
+            return { 
+            success: false, 
+            error: "No tienes permiso para eliminar este punto. Solo el creador puede eliminarlo." 
+            };
+        }
+        
+        // Eliminamos el punto de referencia
+        const { data, error } = await supabase
+            .from('punto_referencia')
+            .delete()
+            .eq('id', puntoId);
+    
+        if (error) {
+            return { success: false, error: error.message };
+        }
+    
+        console.log(`✅ Punto de referencia ${puntoId} eliminado correctamente`);
+        return { success: true, data };
+        } catch (error) {
+        console.error(`❌ Error al eliminar punto de referencia ${puntoId}:`, error);
+        return { success: false, error: error.message };
+        }
+};

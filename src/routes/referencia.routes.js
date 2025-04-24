@@ -8,5 +8,6 @@ const authMiddleware = require('../middlewares/auth.middleware'); // Asumiendo q
 router.get('/siguiente-id', authMiddleware, referenciaController.getSiguienteId);
 router.post('/', authMiddleware, referenciaController.insertarReferencia);
 router.put('/:id', authMiddleware, referenciaController.actualizarReferencia);
+router.delete('/:id', authMiddleware, referenciaController.eliminarReferencia);
 
 module.exports = router;
