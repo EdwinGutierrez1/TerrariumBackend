@@ -8,6 +8,7 @@ const userRoutes = require('./routes/user.routes');
 const brigadistaRoutes = require('./routes/brigadista.routes');
 const coordenadasRoutes = require('./routes/coordenadas.routes');
 const referenciaRoutes = require('./routes/referencia.routes'); 
+const trayectoRoutes = require('./routes/trayecto.routes');
 // Importar otras rutas según necesites
 
 // Configuración
@@ -25,6 +26,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/brigadista', brigadistaRoutes);
 app.use('/api/coordenadas', coordenadasRoutes);
 app.use('/api/referencias', referenciaRoutes);
+app.use('/api/trayectos', trayectoRoutes);
+
 // Añadir otras rutas
 
 // Ruta base para verificar que el servidor está funcionando

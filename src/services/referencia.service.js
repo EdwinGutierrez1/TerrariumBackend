@@ -8,7 +8,7 @@ exports.obtenerSiguienteId = async () => {
         const { data, error } = await supabase
         .from("punto_referencia")
         .select("id")
-        .order("id", { ascending: false })
+        .order("id", { ascending: false }) 
         .limit(1);
 
         if (error) {
