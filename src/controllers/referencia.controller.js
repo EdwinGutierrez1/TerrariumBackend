@@ -136,3 +136,32 @@ exports.obtenerReferenciaPorId = async (req, res) => {
         });
     }
 };
+
+// Nueva función para obtener puntos de referencia por ID de conglomerado
+exports.getPuntosReferenciaByConglomerado = async (req, res) => {
+    try {
+        const { idConglomerado } = req.params;
+        
+        if (!idConglomerado) {
+            return res.status(400).json({
+                success: false,
+                message: "Se requiere el ID del conglomerado"
+            });
+        }
+        
+        const puntos = await referenciaService.getPuntosReferenciaByConglomerado(idConglomerado);
+        
+        return res.status(200).json({
+            success: true,
+            data: puntos
+        });
+    } catch (error) {
+        console.error("Error en getPuntosReferenciaByConglomerado controller:", error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener puntos de referencia',
+            error: error.message
+        });
+    }
+};
+
