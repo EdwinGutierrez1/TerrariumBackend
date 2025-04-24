@@ -65,3 +65,50 @@ exports.insertarReferencia = async (puntoReferencia) => {
         throw error;
         }
 };
+
+exports.actualizarReferencia = async (puntoReferencia) => {
+    try {
+      // Verificamos si el brigadista es el creador del punto
+        const { data: puntoExistente, error: errorConsulta } = await supabase
+            .from('punto_referencia')
+            .select('cedula_brigadista')
+            .eq('id', puntoReferencia.id)
+            .single();
+        
+        if (errorConsulta) {
+            return { success: false, error: "Error al consultar el punto de referencia" };
+        }
+        
+        // Si el brigadista actual no es el creador, retornamos error
+        if (puntoExistente.cedula_brigadista !== puntoReferencia.cedula_brigadista) {
+            return { 
+            success: false, 
+            error: "No tienes permiso para modificar este punto. Solo el creador puede modificarlo." 
+            };
+        }
+        
+        // Preparamos los datos para actualizar
+        const puntoData = {
+            latitud: puntoReferencia.latitud,
+            longitud: puntoReferencia.longitud,
+            descripcion: puntoReferencia.descripcion,
+            error: puntoReferencia.error,
+            cedula_brigadista: puntoReferencia.cedula_brigadista,
+        };
+        
+        // Actualizamos en la base de datos
+        const { error } = await supabase
+            .from('punto_referencia')
+            .update(puntoData)
+            .eq('id', puntoReferencia.id);
+        
+        if (error) {
+            return { success: false, error: error.message };
+        }
+        
+        return { success: true };
+        } catch (error) {
+        console.error("Error al actualizar punto de referencia:", error);
+        return { success: false, error: error.message };
+        }
+};

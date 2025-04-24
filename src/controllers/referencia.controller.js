@@ -37,3 +37,39 @@ exports.insertarReferencia = async (req, res) => {
         });
     }
 };
+
+exports.actualizarReferencia = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const puntoReferencia = req.body;
+        
+        // Validamos que el ID del parámetro coincida con el del cuerpo
+        if (id !== puntoReferencia.id) {
+            return res.status(400).json({
+            success: false,
+            message: 'El ID del punto de referencia no coincide con el de la URL'
+            });
+        }
+        
+        const resultado = await referenciaService.actualizarReferencia(puntoReferencia);
+        
+        if (resultado.success) {
+            return res.status(200).json({
+            success: true,
+            message: 'Punto de referencia actualizado correctamente'
+            });
+        } else {
+            return res.status(403).json({
+            success: false,
+            message: resultado.error
+            });
+        }
+        } catch (error) {
+        console.error('Error en actualizarReferencia controller:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al actualizar punto de referencia',
+            error: error.message
+        });
+        }
+};
