@@ -9,5 +9,6 @@ router.get('/siguiente-id', authMiddleware, referenciaController.getSiguienteId)
 router.post('/', authMiddleware, referenciaController.insertarReferencia);
 router.put('/:id', authMiddleware, referenciaController.actualizarReferencia);
 router.delete('/:id', authMiddleware, referenciaController.eliminarReferencia);
+router.get('/:id', authMiddleware, referenciaController.obtenerReferenciaPorId);
 
 module.exports = router;

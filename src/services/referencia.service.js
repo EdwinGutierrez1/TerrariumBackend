@@ -156,3 +156,21 @@ exports.eliminarReferencia = async (puntoId, cedulaBrigadista) => {
         return { success: false, error: error.message };
         }
 };
+
+exports.obtenerReferenciaPorId = async (id) => {
+    try {
+        const { data, error } = await supabase
+            .from('punto_referencia')
+            .select('*')
+            .eq('id', id)
+            .single();
+        
+        if (error) throw error;
+        
+        return data;
+        } catch (error) {
+        console.error("Error al obtener referencia por ID:", error);
+        throw error;
+    }
+};
+

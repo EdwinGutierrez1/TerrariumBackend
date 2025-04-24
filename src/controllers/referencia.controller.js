@@ -109,3 +109,30 @@ exports.eliminarReferencia = async (req, res) => {
         });
         }
 };
+
+exports.obtenerReferenciaPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        const referencia = await referenciaService.obtenerReferenciaPorId(id);
+        
+        if (referencia) {
+            return res.status(200).json({
+            success: true,
+            data: referencia
+            });
+        } else {
+            return res.status(404).json({
+            success: false,
+            message: 'Punto de referencia no encontrado'
+            });
+        }
+        } catch (error) {
+        console.error('Error en obtenerReferenciaPorId controller:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener punto de referencia',
+            error: error.message
+        });
+    }
+};
