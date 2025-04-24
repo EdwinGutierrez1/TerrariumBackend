@@ -109,3 +109,38 @@ exports.obtenerIdTrayecto = async (req, res) => {
     });
   }
 };
+
+
+exports.guardarTrayecto = async (req, res) => {
+  try {
+    const { datosTrayecto, puntoId } = req.body;
+    const cedulaBrigadista = datosTrayecto.cedula_brigadista;
+
+    // Verificar que el punto de referencia pertenezca al brigadista
+    const puntoReferencia = await referenciaService.obtenerReferenciaPorId(puntoId);
+
+    if (!puntoReferencia) {
+      return res.status(404).json({ 
+        success: false,
+        error: "El punto de referencia no existe" 
+      });
+    }
+
+    if (puntoReferencia.cedula_brigadista !== cedulaBrigadista) {
+      return res.status(403).json({ 
+        success: false, 
+        error: "No tienes permisos para añadir trayectos a este punto de referencia" 
+      });
+    }
+
+    const result = await trayectoService.insertarTrayecto(datosTrayecto, puntoId);
+    
+    return res.status(201).json(result);
+  } catch (error) {
+    console.error('Error en guardarTrayecto:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: error.message || "Error al guardar el trayecto" 
+    });
+  }
+};

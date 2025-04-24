@@ -165,3 +165,31 @@ exports.getPuntosReferenciaByConglomerado = async (req, res) => {
     }
 };
 
+exports.VerificarPuntosReferencia = async (req, res) => {
+    try {
+        const { cedulaBrigadista } = req.params;
+        
+        if (!cedulaBrigadista) {
+            return res.status(400).json({
+                success: false,
+                message: "Se requiere la cédula del brigadista"
+            });
+        }
+        
+        // Corregido: usamos cedulaBrigadista en lugar de idConglomerado
+        const cantidadPuntos = await referenciaService.VerificarPuntosReferencia(cedulaBrigadista);
+        
+        return res.status(200).json({
+            success: true,
+            cantidad: cantidadPuntos  // Cambié data por cantidad para ser más explícito
+        });
+
+    } catch (error) {
+        console.error("Error en VerificarPuntosReferencia controller:", error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener la cantidad de puntos de referencia del brigadista',
+            error: error.message
+        });
+    }
+};

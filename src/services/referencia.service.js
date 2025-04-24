@@ -249,3 +249,32 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
         throw error;
     }
 };
+
+exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
+    try {
+        if (!cedulaBrigadista) {
+            console.warn("verificarPuntosReferencia: No se proporcionó cedulaBrigadista");
+            return 0;
+        }
+    
+        // Consulta específica para puntos de referencia
+        const { data, error } = await supabase
+            .from("punto_referencia")
+            .select("id")
+            .eq("cedula_brigadista", cedulaBrigadista)
+            .eq("tipo", "Referencia");
+    
+        if (error) {
+            console.error("Error al consultar puntos de referencia:", error);
+            return 0;
+        }
+    
+        console.log(`Se encontraron ${data.length} puntos de referencia para el brigadista ${cedulaBrigadista}`);
+        return data.length;
+        } catch (err) {
+        console.error("Error inesperado al verificar puntos:", err);
+        return 0;
+        }
+};
+
+
