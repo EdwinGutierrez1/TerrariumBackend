@@ -1,8 +1,7 @@
-#NO BORRAR ESTE ARCHIVO!!!
-#Se añaden archivos con la información de las credenciales al .gitignore para evitar que cualquier persona pueda
-#tener acceso a estas, ya que la seguridad se vería comprometida.
-#Esto significa que no bastará con clonar el repositorio para que el proyecto funcione, será necesario incluir
-#denuevo estos archivos
+
+# Se ignoran archivos que contienen credenciales o configuraciones sensibles.
+# Esto ayuda a proteger información privada y mantener la seguridad del proyecto.
+# No bastará con clonar el repositorio para que el proyecto funcione, será necesario incluir denuevo estos archivos
 
 # Credenciales de Firebase
 firebase-adminsdk.json
