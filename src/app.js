@@ -1,41 +1,41 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
 
-// Importar rutas
-const authRoutes = require('./routes/auth.routes');
-const userRoutes = require('./routes/user.routes');
-const brigadistaRoutes = require('./routes/brigadista.routes');
-const coordenadasRoutes = require('./routes/coordenadas.routes');
-const referenciaRoutes = require('./routes/referencia.routes'); 
-const trayectoRoutes = require('./routes/trayecto.routes');
-const subparcelaRoutes = require('./routes/subparcela.routes');
-// Importar otras rutas según necesites
+const express = require('express');  // Framework para construir el servidor web
+const cors = require('cors');        // Middleware para habilitar CORS (Cross-Origin Resource Sharing)
+const dotenv = require('dotenv');    // Carga variables de entorno desde el archivo .env
 
-// Configuración
+// Importación de las rutas definidas en archivos separados
+const authRoutes = require('./routes/auth.routes');    // Rutas de autenticación
+const userRoutes = require('./routes/user.routes');     // Rutas de usuarios
+const brigadistaRoutes = require('./routes/brigadista.routes');   
+const coordenadasRoutes = require('./routes/coordenadas.routes'); 
+const referenciaRoutes = require('./routes/referencia.routes');   
+const trayectoRoutes = require('./routes/trayecto.routes');       
+const subparcelaRoutes = require('./routes/subparcela.routes');   
+
+// Configurar variables de entorno desde .env
 dotenv.config();
+
+// Crear la instancia de la aplicación Express
 const app = express();
 
-// Middlewares
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Middlewares globales
+app.use(cors());            // Habilitar CORS para permitir solicitudes desde el frontend
+app.use(express.json());    // Parsear cuerpos de solicitud en formato JSON
+app.use(express.urlencoded({ extended: true })); // Parsear datos de formularios codificados en URL
 
-// Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/brigadista', brigadistaRoutes);
-app.use('/api/coordenadas', coordenadasRoutes);
-app.use('/api/referencias', referenciaRoutes);
-app.use('/api/trayectos', trayectoRoutes);
-app.use('/api/trayectos', trayectoRoutes);
-app.use('/api/subparcelas', subparcelaRoutes);
+// Registro de rutas bajo prefijos específicos
+app.use('/api/auth', authRoutes);               
+app.use('/api/users', userRoutes);           
+app.use('/api/brigadista', brigadistaRoutes);  
+app.use('/api/coordenadas', coordenadasRoutes); 
+app.use('/api/referencias', referenciaRoutes);  
+app.use('/api/trayectos', trayectoRoutes);    
+app.use('/api/subparcelas', subparcelaRoutes); 
 
-// Añadir otras rutas
-
-// Ruta base para verificar que el servidor está funcionando
+// Ruta raíz del servidor para comprobar si está funcionando
 app.get('/', (req, res) => {
     res.json({ message: 'Bienvenido a la API del backend' });
 });
 
+// Exportar la aplicación para ser usada por otros archivos.
 module.exports = app;

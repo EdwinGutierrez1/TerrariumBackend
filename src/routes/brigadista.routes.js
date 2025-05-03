@@ -1,11 +1,13 @@
-const express = require('express');
-const router = express.Router();
-const brigadistaController = require('../controllers/brigadista.controller');
-const authMiddleware = require('../middlewares/auth.middleware'); // Asumiendo que tienes un middleware de autenticación
-const verifyToken = require('../middlewares/auth.middleware');
+const express = require('express'); //Importamos Express para poder usar su router
+const router = express.Router(); //Creamos una instancia del router
+const brigadistaController = require('../controllers/brigadista.controller'); // Importamos el controlador que contiene la lógica para las rutas de brigadista
+const authMiddleware = require('../middlewares/auth.middleware'); // Middleware para verificar token
 
-// Rutas protegidas que requieren autenticación
-router.get('/info', verifyToken, brigadistaController.getInfoBrigadista);
+// Ruta GET para obtener información del brigadista autenticado
+router.get('/info', authMiddleware, brigadistaController.getInfoBrigadista);
+
+// Ruta POST para actualizar el estado del tutorial
 router.post('/tutorial', authMiddleware, brigadistaController.updateTutorialCompletado);
 
+//Exportamos el router para que pueda ser usado por el archivo principal de rutas
 module.exports = router;

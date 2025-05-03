@@ -1,8 +1,12 @@
-const express = require('express');
-const router = express.Router();
-const subparcelaController = require('../controllers/subparcela.controller');
-const authMiddleware = require('../middlewares/auth.middleware');
+//Rutas de subparcelas
 
+const express = require('express'); // para la definición de rutas
+const router = express.Router(); // Instanciamos el router de Express
+const subparcelaController = require('../controllers/subparcela.controller'); // Importamos el controlador de subparcelas 
+const authMiddleware = require('../middlewares/auth.middleware'); // Importamos el middleware de autenticación para proteger las rutas
+
+//Ruta POST para sincronizar datos de subparcelas
 router.post('/sincronizar', authMiddleware, subparcelaController.sincronizarSubparcelas);
 
-module.exports = router;    
+// Exportamos el router para ser utilizado en app.js
+module.exports = router;

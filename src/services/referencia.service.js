@@ -1,10 +1,19 @@
-// services/referencia.service.js
-const supabase = require('../config/supabase.config');
+/**
+ * Servicio de Puntos de Referencia
+ * Contiene la lógica para gestionar los puntos de referencia geográficos, utilizados por los brigadistas en campo.
+**/
 
-// Servicio para obtener el siguiente ID de referencia
+const supabase = require('../config/supabase.config'); //Importamos el modulo de configuración de supabase.
+
+/**
+ * Genera el siguiente ID disponible para un nuevo punto de referencia. Los id's son del tipo PR001, PR002, PR003...
+ * devuelve una string, que es el siguiente ID disponible con dicho formato.
+ * Arroja un error si falla la consulta a la base de datos
+ */
+
 exports.obtenerSiguienteId = async () => {
     try {
-        // Realiza una consulta a la tabla punto_referencia
+        // Realiza una consulta a la tabla punto_referencia para obtener el último ID
         const { data, error } = await supabase
         .from("punto_referencia")
         .select("id")
@@ -24,21 +33,31 @@ exports.obtenerSiguienteId = async () => {
         // Obtener el último ID
         const ultimoId = data[0].id;
 
-        // Extraer el número del ID (ejemplo: PR001 -> 1)
+        // Extraer el número del ID (por ejemplo: PR001 -> 1)
+        // Primero eliminamos el prefijo "PR" y luego convertimos la parte numérica a un número entero en base 10
         const numero = parseInt(ultimoId.replace("PR", ""), 10);
 
-        // Generar el siguiente ID
+        // Incrementamos el número en uno para generar el siguiente ID
         const siguienteNumero = numero + 1;
+
+        // Convertimos el número a string y le añadimos ceros a la izquierda hasta tener 3 dígitos
+        // Luego lo concatenamos con el prefijo "PR" para obtener el nuevo ID
         const siguienteId = `PR${siguienteNumero.toString().padStart(3, "0")}`;
 
+        // Devolvemos el nuevo ID generado, por ejemplo: "PR002"
         return siguienteId;
-    } catch (error) {
+
+    } catch (error) { //Si ocurre algún error en la función
         console.error("Error al obtener el siguiente ID:", error);
         throw error;
     }
 };
 
-// Servicio para insertar una nueva referencia
+/**
+ * Inserta un nuevo punto de referencia en la base de datos
+ * puntoReferencia - Objeto con los datos del punto de referencia
+ * devuelve el ID del punto de referencia insertado
+ */
 exports.insertarReferencia = async (puntoReferencia) => {
     try {
       // Preparar el objeto de datos con los nombres correctos de columnas
@@ -49,23 +68,31 @@ exports.insertarReferencia = async (puntoReferencia) => {
         descripcion: puntoReferencia.descripcion,
         error: puntoReferencia.error,
         cedula_brigadista: puntoReferencia.cedula_brigadista,
-        tipo: puntoReferencia.tipo || 'Referencia'
+        tipo: puntoReferencia.tipo || 'Referencia' // Valor por defecto si no se especifica
         };
-      // Insertar en la base de datos
+
+        // Insertar en la base de datos
         const { data, error } = await supabase
         .from('punto_referencia')
         .insert(puntoData)
         .select();
-        if (error) throw error;
+        
+        if (error) throw error; //Si por alguna razón la inserción falla.
         
         // Devolver el ID del registro insertado
         return data[0].id;
-        } catch (error) {
+        } catch (error) { //Si ocurre un error en la ejecución de la función
         console.error("Error al insertar punto de referencia:", error);
         throw error;
         }
 };
 
+/**
+ * Actualiza un punto de referencia existente
+ * Verifica que solo el brigadista que creó el punto pueda modificarlo
+ * puntoReferencia - Objeto con los datos actualizados del punto
+ * devuelve un bjeto con indicador de éxito o mensaje de error si aplica
+ */
 exports.actualizarReferencia = async (puntoReferencia) => {
     try {
       // Verificamos si el brigadista es el creador del punto
@@ -87,7 +114,7 @@ exports.actualizarReferencia = async (puntoReferencia) => {
             };
         }
         
-        // Preparamos los datos para actualizar
+        // De lo contrario, preparamos los datos para actualizar
         const puntoData = {
             latitud: puntoReferencia.latitud,
             longitud: puntoReferencia.longitud,
@@ -103,16 +130,23 @@ exports.actualizarReferencia = async (puntoReferencia) => {
             .eq('id', puntoReferencia.id);
         
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: error.message }; //Si hay un error al intentar hacer el update.
         }
         
         return { success: true };
-        } catch (error) {
+        } catch (error) { //Si hay un error en la ejercución de la función
         console.error("Error al actualizar punto de referencia:", error);
         return { success: false, error: error.message };
         }
 };
 
+/**
+ * Elimina un punto de referencia existente
+ * Verifica que solo el brigadista que creó el punto pueda eliminarlo
+ * puntoId - ID del punto de referencia a eliminar
+ * cedulaBrigadista - Cédula del brigadista que solicita la eliminación
+ * devuelve un objeto con indicador de éxito y datos o un mensaje de error
+ */
 exports.eliminarReferencia = async (puntoId, cedulaBrigadista) => {
     try {
       // Verificamos si el brigadista es el creador del punto
@@ -122,7 +156,7 @@ exports.eliminarReferencia = async (puntoId, cedulaBrigadista) => {
             .eq('id', puntoId)
             .single();
         
-        if (errorConsulta) {
+        if (errorConsulta) { //Si hay un error en la consulta.
             return { success: false, error: "Error al consultar el punto de referencia" };
         }
         
@@ -139,26 +173,33 @@ exports.eliminarReferencia = async (puntoId, cedulaBrigadista) => {
             };
         }
         
-        // Eliminamos el punto de referencia
+        // De lo contrario, eliminamos el punto de referencia
         const { data, error } = await supabase
             .from('punto_referencia')
             .delete()
             .eq('id', puntoId);
     
         if (error) {
-            return { success: false, error: error.message };
+            return { success: false, error: error.message }; //Si falla el delete.
         }
     
         console.log(`✅ Punto de referencia ${puntoId} eliminado correctamente`);
-        return { success: true, data };
+        return { success: true, data }; //Si se elimina correctamente.
+
         } catch (error) {
         console.error(`❌ Error al eliminar punto de referencia ${puntoId}:`, error);
-        return { success: false, error: error.message };
+        return { success: false, error: error.message }; //Si se produce un error en la ejecucución de la función.
         }
 };
 
+/**
+ * Obtiene los datos de un punto de referencia por su ID
+ * id - ID del punto de referencia
+ * retorna los Datos del punto de referencia o null si no existe
+ */
 exports.obtenerReferenciaPorId = async (id) => {
     try {
+        //consulta en la tabla "punto_referencia"
         const { data, error } = await supabase
             .from('punto_referencia')
             .select('*')
@@ -168,35 +209,41 @@ exports.obtenerReferenciaPorId = async (id) => {
         if (error) throw error;
         
         return data;
-        } catch (error) {
+
+        } catch (error) { //Si se produce un error.
         console.error("Error al obtener referencia por ID:", error);
         throw error;
     }
 };
 
-// Nueva función para obtener puntos de referencia por ID de conglomerado
+/**
+ * Obtiene todos los puntos de referencia asociados a un conglomerado, para ello se realizan múltiples consultas.
+ * También se obtienen los trayectos asociados a cada punto de referencia
+ * idConglomerado - ID del conglomerado a consultar
+ * devuelve un Array de puntos de referencia con sus trayectos
+ */
 exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
     try {
         if (!idConglomerado) {
             throw new Error("Se requiere el ID del conglomerado");
         }
         
-        // Obtenemos las brigadas asociadas al conglomerado
+        // Paso 1: Obtenemos el id de la brigada asociada al conglomerado
         const { data: brigadas, error: brigadasError } = await supabase
             .from('brigada')
             .select('id')
             .eq('id_conglomerado', idConglomerado);
         
-        if (brigadasError) throw brigadasError;
+        if (brigadasError) throw brigadasError; //Si se produce un error
         
         if (!brigadas || brigadas.length === 0) {
             return []; // No hay brigadas para este conglomerado
         }
         
-        // Obtenemos los IDs de las brigadas
+        // Mapeamos el id de la brigada
         const brigadaIds = brigadas.map(brigada => brigada.id);
         
-        // Obtenemos los brigadistas asociados a estas brigadas
+        // Paso 2: Obtenemos las cedulas de los brigadistas asociados a esta brigada
         const { data: brigadistas, error: brigadistasError } = await supabase
             .from('brigadista')
             .select('cedula')
@@ -205,13 +252,13 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
         if (brigadistasError) throw brigadistasError;
         
         if (!brigadistas || brigadistas.length === 0) {
-            return []; // No hay brigadistas para estas brigadas
+            return []; // No hay brigadistas para esta brigada
         }
         
-        // Obtenemos las cédulas de los brigadistas
+        // Mapeamos las cédulas de los brigadistas, para que sean un array "sencillo"
         const cedulasBrigadistas = brigadistas.map(brigadista => brigadista.cedula);
         
-        // Ahora obtenemos los puntos de referencia asociados a estos brigadistas (por cédula)
+        // Paso 3: Obtenemos los puntos de referencia asociados a estos brigadistas (usando la cédula)
         const { data: puntosData, error: puntosError } = await supabase
             .from('punto_referencia')
             .select('*')
@@ -223,10 +270,11 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
         if (!puntosData || puntosData.length === 0) {
             return []; // No hay puntos de referencia para estos brigadistas
         }
-        
-        // Obtenemos los trayectos para cada punto
+
+        //Obtenemos los id's de cada punto
         const puntoIds = puntosData.map(punto => punto.id);
         
+        // Paso 4: Obtenemos los trayectos para cada punto
         const { data: trayectosData, error: trayectosError } = await supabase
             .from('trayecto')
             .select('*')
@@ -234,8 +282,10 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
         
         if (trayectosError) throw trayectosError;
         
-        // Combinamos los datos
+        // Paso 5: Combinamos los datos de puntos y trayectos
         const puntosConTrayectos = puntosData.map(punto => {
+
+            // Filtramos los trayectos que corresponden a este punto en particular
             const trayectosDelPunto = trayectosData.filter(t => t.id_punto_referencia === punto.id);
             return {
                 ...punto,
@@ -250,6 +300,11 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
     }
 };
 
+/**
+ * Verifica y cuenta los puntos de referencia asociados a un brigadista
+ * cedulaBrigadista - Cédula del brigadista a consultar
+ * retorna la cantidad de puntos de referencia asociados al brigadista (dato de tipo numerico)
+ */
 exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
     try {
         if (!cedulaBrigadista) {
@@ -264,17 +319,16 @@ exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
             .eq("cedula_brigadista", cedulaBrigadista)
             .eq("tipo", "Referencia");
     
-        if (error) {
+        if (error) { //Error en al consulta.
             console.error("Error al consultar puntos de referencia:", error);
             return 0;
         }
     
         console.log(`Se encontraron ${data.length} puntos de referencia para el brigadista ${cedulaBrigadista}`);
         return data.length;
-        } catch (err) {
+
+        } catch (err) { //Si se produce un error en la ejecucución de la función.
         console.error("Error inesperado al verificar puntos:", err);
         return 0;
         }
 };
-
-
