@@ -46,7 +46,6 @@ exports.login = async (req, res) => {
  *  Se retorna el nombre del usuario o en su defecto un mensaje de error
  */
 
-
 exports.getUserName = async (req, res) => {
   const { uid } = req.params;
   console.log(`Solicitud de nombre para usuario: ${uid}`);
