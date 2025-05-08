@@ -243,3 +243,43 @@ exports.VerificarPuntosReferencia = async (req, res) => {
         });
     }
 };
+
+//FUNCION NUEVA SOSOCHI
+exports.verificarCampamento = async (req, res) => {
+    try {
+      const uid = req.user.uid; // Obtenemos el UID del usuario autenticado
+      
+      // Obtenemos la información del brigadista para conocer su id_conglomerado
+      const brigadistaInfo = await brigadistaService.getInfoBrigadista(uid);
+      
+      if (!brigadistaInfo) {
+        return res.status(404).json({
+          success: false,
+          message: 'No se encontró información del brigadista'
+        });
+      }
+  
+      // Llamamos al servicio para verificar si existe un campamento
+      const resultado = await referenciaService.verificarCampamentoExistente(brigadistaInfo.idConglomerado);
+      
+      if (resultado.error) {
+        return res.status(500).json({
+          success: false,
+          message: 'Error al verificar campamento',
+          error: resultado.error
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        existeCampamento: resultado.existe,
+        idCampamento: resultado.id
+      });
+    } catch (error) {
+      console.error('Error en verificarCampamento controller:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Error al verificar campamento'
+      });
+    }
+  };

@@ -27,4 +27,7 @@ router.get('/punto/:id', authMiddleware, referenciaController.obtenerReferenciaP
 //ruta para verificar la cantidad de puntos de referencia asociados a un brigadista
 router.get('/verificar/:cedulaBrigadista', authMiddleware, referenciaController.VerificarPuntosReferencia);
 
+//RUTA NUEVA SOSOCHI
+router.get('/verificar-campamento', verifyToken, referenciaController.verificarCampamento);
+
 module.exports = router; //Se exporta el router para ser usado en app.js

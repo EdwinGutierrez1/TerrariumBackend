@@ -333,3 +333,45 @@ exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
         return 0;
         }
 };
+
+
+//FUNCION AÑADIDA SOSOCHI
+exports.verificarCampamentoExistente = async (idConglomerado) => {
+    try {
+      console.log("⏳ Verificando si existe campamento para conglomerado:", idConglomerado);
+  
+      // Validación inicial
+      if (!idConglomerado) {
+        console.error("❌ Error: ID de conglomerado no proporcionado");
+        return { existe: false, error: "ID de conglomerado no proporcionado" };
+      }
+  
+      // Primero obtenemos todos los puntos de referencia del conglomerado
+      const { data: puntosConglomerado, error: errorPuntos } = await supabase
+        .from("punto_referencia")
+        .select("id, tipo")
+        .eq("id_conglomerado", idConglomerado)
+        .eq("tipo", "Campamento");
+  
+      if (errorPuntos) {
+        console.error("❌ Error al verificar campamento:", errorPuntos);
+        return { existe: false, error: errorPuntos.message };
+      }
+  
+      // Verificamos si hay algún punto de tipo "Campamento"
+      const existeCampamento = puntosConglomerado && puntosConglomerado.length > 0;
+  
+      console.log(
+        `✅ Verificación completada: ${existeCampamento ? "Existe" : "No existe"} campamento para conglomerado ${idConglomerado}`
+      );
+  
+      return { 
+        existe: existeCampamento, 
+        id: existeCampamento ? puntosConglomerado[0].id : null 
+      };
+      
+    } catch (err) {
+      console.error("🚨 Error inesperado en verificarCampamentoExistente:", err);
+      return { existe: false, error: err.message };
+    }
+  };
