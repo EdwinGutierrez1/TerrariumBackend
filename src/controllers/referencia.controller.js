@@ -2,6 +2,7 @@
 //Controlador de Puntos de Referencia. Maneja las solicitudes HTTP relacionadas con los puntos de referencia añadidos por los brigadistas en el campo.
 
 const referenciaService = require('../services/referencia.service'); //Importamos el modulo del servicio de puntos de referencia. 
+const brigadistaService = require('../services/brigadista.service'); 
 
 /**
  * Obtiene el siguiente ID disponible para un nuevo punto de referencia. Estos id's son de la forma PR001, PR002, PR003...
@@ -240,6 +241,79 @@ exports.VerificarPuntosReferencia = async (req, res) => {
             success: false,
             message: 'Error al obtener la cantidad de puntos de referencia del brigadista',
             error: error.message
+        });
+    }
+};
+
+//FUNCION A MODIFICAR
+exports.verificarCampamento = async (req, res) => {
+    try {
+        console.log("🔍 Controller: Iniciando verificación de campamento");
+        const uid = req.user?.uid; // Usamos el operador ? para prevenir errores
+        
+        // Verificamos si tenemos el uid
+        if (!uid) {
+            console.log("❌ Controller: Usuario no autenticado correctamente");
+            return res.status(401).json({
+                success: false,
+                message: 'Usuario no autenticado correctamente'
+            });
+        }
+        
+        console.log("👤 Controller: Usuario autenticado con UID:", uid);
+        
+        // Obtenemos la información del brigadista para conocer su id_conglomerado
+        console.log("🔍 Controller: Obteniendo información del brigadista");
+        const brigadistaInfo = await brigadistaService.getInfoBrigadista(uid);
+        
+        console.log("👤 Controller: Información del brigadista:", brigadistaInfo ? "Encontrada" : "No encontrada");
+        
+        if (!brigadistaInfo) {
+            console.log("❌ Controller: No se encontró información del brigadista");
+            return res.status(404).json({
+                success: false,
+                message: 'No se encontró información del brigadista'
+            });
+        }
+        
+        if (!brigadistaInfo.idConglomerado) {
+            console.log("❌ Controller: Brigadista sin conglomerado asignado");
+            return res.status(404).json({
+                success: false,
+                message: 'El brigadista no tiene un conglomerado asignado'
+            });
+        }
+        
+        console.log("🏕️ Controller: Conglomerado del brigadista:", brigadistaInfo.idConglomerado);
+    
+        // Llamamos al servicio para verificar si existe un campamento
+        console.log("🔍 Controller: Llamando al servicio para verificar campamento");
+        const resultado = await referenciaService.verificarCampamentoExistente(brigadistaInfo.idConglomerado);
+        
+        console.log("✅ Controller: Resultado del servicio:", resultado);
+        
+        if (resultado.error) {
+            console.log("❌ Controller: Error reportado por el servicio:", resultado.error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al verificar campamento',
+                error: resultado.error,
+                existeCampamento: false
+            });
+        }
+    
+        console.log("✅ Controller: Enviando respuesta exitosa");
+        return res.status(200).json({
+            success: true,
+            existeCampamento: resultado.existe,
+            idCampamento: resultado.id
+        });
+    } catch (error) {
+        console.error('❌ Error en verificarCampamento controller:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al verificar campamento: ' + (error.message || 'Error desconocido'),
+            existeCampamento: false
         });
     }
 };
