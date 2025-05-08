@@ -262,7 +262,7 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
         const { data: puntosData, error: puntosError } = await supabase
             .from('punto_referencia')
             .select('*')
-            .eq('tipo', 'Referencia')
+            .neq('tipo', 'Centro Poblado')
             .in('cedula_brigadista', cedulasBrigadistas);
         
         if (puntosError) throw puntosError;
@@ -305,6 +305,7 @@ exports.getPuntosReferenciaByConglomerado = async (idConglomerado) => {
  * cedulaBrigadista - Cédula del brigadista a consultar
  * retorna la cantidad de puntos de referencia asociados al brigadista (dato de tipo numerico)
  */
+
 exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
     try {
         if (!cedulaBrigadista) {
