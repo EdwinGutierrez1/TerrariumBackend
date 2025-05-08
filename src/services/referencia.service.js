@@ -118,6 +118,7 @@ exports.actualizarReferencia = async (puntoReferencia) => {
         const puntoData = {
             latitud: puntoReferencia.latitud,
             longitud: puntoReferencia.longitud,
+            tipo: puntoReferencia.tipo,
             descripcion: puntoReferencia.descripcion,
             error: puntoReferencia.error,
             cedula_brigadista: puntoReferencia.cedula_brigadista,
