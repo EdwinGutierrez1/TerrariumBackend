@@ -28,6 +28,6 @@ router.get('/punto/:id', authMiddleware, referenciaController.obtenerReferenciaP
 router.get('/verificar/:cedulaBrigadista', authMiddleware, referenciaController.VerificarPuntosReferencia);
 
 //RUTA NUEVA SOSOCHI
-router.get('/verificar-campamento', verifyToken, referenciaController.verificarCampamento);
+router.get('/verificar-campamento', authMiddleware, referenciaController.verificarCampamento);
 
 module.exports = router; //Se exporta el router para ser usado en app.js

@@ -338,40 +338,83 @@ exports.VerificarPuntosReferencia = async (cedulaBrigadista) => {
 //FUNCION AÑADIDA SOSOCHI
 exports.verificarCampamentoExistente = async (idConglomerado) => {
     try {
-      console.log("⏳ Verificando si existe campamento para conglomerado:", idConglomerado);
-  
-      // Validación inicial
-      if (!idConglomerado) {
-        console.error("❌ Error: ID de conglomerado no proporcionado");
-        return { existe: false, error: "ID de conglomerado no proporcionado" };
-      }
-  
-      // Primero obtenemos todos los puntos de referencia del conglomerado
-      const { data: puntosConglomerado, error: errorPuntos } = await supabase
-        .from("punto_referencia")
-        .select("id, tipo")
-        .eq("id_conglomerado", idConglomerado)
-        .eq("tipo", "Campamento");
-  
-      if (errorPuntos) {
-        console.error("❌ Error al verificar campamento:", errorPuntos);
-        return { existe: false, error: errorPuntos.message };
-      }
-  
-      // Verificamos si hay algún punto de tipo "Campamento"
-      const existeCampamento = puntosConglomerado && puntosConglomerado.length > 0;
-  
-      console.log(
-        `✅ Verificación completada: ${existeCampamento ? "Existe" : "No existe"} campamento para conglomerado ${idConglomerado}`
-      );
-  
-      return { 
-        existe: existeCampamento, 
-        id: existeCampamento ? puntosConglomerado[0].id : null 
-      };
-      
+        console.log("⏳ Service: Verificando si existe campamento para conglomerado:", idConglomerado);
+    
+        // Validación inicial
+        if (!idConglomerado) {
+            console.error("❌ Service: Error: ID de conglomerado no proporcionado");
+            return { existe: false, error: "ID de conglomerado no proporcionado" };
+        }
+    
+        // Paso 1: Obtenemos el id de la brigada asociada al conglomerado
+        console.log("🔍 Service: Consultando brigadas asociadas al conglomerado");
+        const { data: brigadas, error: brigadasError } = await supabase
+            .from('brigada')
+            .select('id')
+            .eq('id_conglomerado', idConglomerado);
+        
+        if (brigadasError) {
+            console.error("❌ Service: Error al obtener brigadas:", brigadasError);
+            return { existe: false, error: brigadasError.message };
+        }
+        
+        if (!brigadas || brigadas.length === 0) {
+            console.log("ℹ️ Service: No hay brigadas para este conglomerado");
+            return { existe: false };
+        }
+        
+        console.log(`✅ Service: Encontradas ${brigadas.length} brigadas para el conglomerado`);
+        
+        // Mapeamos el id de la brigada
+        const brigadaIds = brigadas.map(brigada => brigada.id);
+        
+        // Paso 2: Obtenemos las cedulas de los brigadistas asociados a esta brigada
+        console.log("🔍 Service: Consultando brigadistas asociados a las brigadas");
+        const { data: brigadistas, error: brigadistasError } = await supabase
+            .from('brigadista')
+            .select('cedula')
+            .in('id_brigada', brigadaIds);
+        
+        if (brigadistasError) {
+            console.error("❌ Service: Error al obtener brigadistas:", brigadistasError);
+            return { existe: false, error: brigadistasError.message };
+        }
+        
+        if (!brigadistas || brigadistas.length === 0) {
+            console.log("ℹ️ Service: No hay brigadistas para estas brigadas");
+            return { existe: false };
+        }
+        
+        console.log(`✅ Service: Encontrados ${brigadistas.length} brigadistas`);
+        
+        // Mapeamos las cédulas de los brigadistas
+        const cedulasBrigadistas = brigadistas.map(brigadista => brigadista.cedula);
+        
+        // Paso 3: Verificamos si existe algún punto de tipo "Campamento" asociado a estos brigadistas
+        console.log("🔍 Service: Verificando puntos de tipo Campamento");
+        const { data: campamentoData, error: campamentoError } = await supabase
+            .from('punto_referencia')
+            .select('id')
+            .eq('tipo', 'Campamento')
+            .in('cedula_brigadista', cedulasBrigadistas);
+        
+        if (campamentoError) {
+            console.error("❌ Service: Error al verificar campamentos:", campamentoError);
+            return { existe: false, error: campamentoError.message };
+        }
+        
+        // Verificamos si hay algún punto de tipo "Campamento"
+        const existeCampamento = campamentoData && campamentoData.length > 0;
+        
+        console.log(
+            `✅ Service: Verificación completada: ${existeCampamento ? "Existe" : "No existe"} campamento para conglomerado ${idConglomerado}`
+        );
+        return { 
+            existe: existeCampamento, 
+            id: existeCampamento ? campamentoData[0].id : null 
+        };
     } catch (err) {
-      console.error("🚨 Error inesperado en verificarCampamentoExistente:", err);
-      return { existe: false, error: err.message };
+        console.error("🚨 Service: Error inesperado en verificarCampamentoExistente:", err);
+        return { existe: false, error: err.message };
     }
-  };
+};
