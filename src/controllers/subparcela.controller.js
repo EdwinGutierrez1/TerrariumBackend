@@ -43,3 +43,33 @@ exports.sincronizarSubparcelas = async (req, res) => {
     });
     }
 };
+
+exports.getArbolesSubparcela = async (req, res) => {
+    try {
+        const { nombreSubparcela, conglomeradoId } = req.params; // Desestructuramos los parámetros de la solicitud
+
+        // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+        if (!nombreSubparcela || !conglomeradoId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Faltan parámetros necesarios para obtener árboles de la subparcela'
+            });
+        }
+
+        // Se ejecuta el servicio correspondiente para obtener los árboles de la subparcela
+        const arboles = await subparcelaService.getArbolesSubparcela(nombreSubparcela, conglomeradoId);
+
+        // Responde con éxito y los datos obtenidos
+        return res.status(200).json({
+            success: true,
+            data: arboles
+        });
+    } catch (error) { //Si se produce un error
+        console.error('Error en getArbolesSubparcela controller:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener árboles de la subparcela',
+            error: error.message
+        });
+    }
+};

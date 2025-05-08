@@ -163,3 +163,38 @@ exports.sincronizarSubparcelas = async (subparcelasCaracteristicas) => {
         throw error;
     }
 };
+
+exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
+    try {
+        // Obtener ID de la subparcela
+        const { data: subparcelaData, error: subparcelaError } = await supabase
+            .from('subparcela')
+            .select('id')
+            .eq('nombre_subparcela', nombreSubparcela)
+            .eq('id_conglomerado', conglomeradoId)
+            .single(); // Solo un resultado esperado
+
+        if (subparcelaError) throw subparcelaError;
+
+        const subparcelaId = subparcelaData.id;
+        console.log('ID de la subparcela:', subparcelaId);
+
+        // Obtener árboles asociados a esa subparcela
+        const { data: arboles, error: arbolError } = await supabase
+            .from('arbol')
+            .select('*')
+            .eq('id_subparcela', subparcelaId);
+
+        if (arbolError) throw arbolError;
+
+
+        // Retornar ambos: id de la subparcela y los árboles
+        return {
+            subparcelaId,
+            arboles
+        };
+    } catch (error) {
+        console.error('Error al obtener árboles de la subparcela:', error);
+        throw error;
+    }
+};
