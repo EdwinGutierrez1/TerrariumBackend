@@ -11,6 +11,7 @@ const coordenadasRoutes = require('./routes/coordenadas.routes');
 const referenciaRoutes = require('./routes/referencia.routes');   
 const trayectoRoutes = require('./routes/trayecto.routes');       
 const subparcelaRoutes = require('./routes/subparcela.routes');   
+const muestrasRoutes = require('./routes/muestras.routes');
 
 // Configurar variables de entorno desde .env
 dotenv.config();
@@ -31,6 +32,7 @@ app.use('/api/coordenadas', coordenadasRoutes);
 app.use('/api/referencias', referenciaRoutes);  
 app.use('/api/trayectos', trayectoRoutes);    
 app.use('/api/subparcelas', subparcelaRoutes); 
+app.use('/api/muestras', muestrasRoutes);       // Rutas para manejar muestras
 
 // Ruta raíz del servidor para comprobar si está funcionando
 app.get('/', (req, res) => {

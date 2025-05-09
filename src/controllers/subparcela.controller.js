@@ -58,7 +58,6 @@ exports.getArbolesSubparcela = async (req, res) => {
 
         // Se ejecuta el servicio correspondiente para obtener los árboles de la subparcela
         const arboles = await subparcelaService.getArbolesSubparcela(nombreSubparcela, conglomeradoId);
-
         // Responde con éxito y los datos obtenidos
         return res.status(200).json({
             success: true,
