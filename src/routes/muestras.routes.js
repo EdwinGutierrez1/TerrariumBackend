@@ -3,6 +3,7 @@ const router = express.Router(); // Creamos un enrutador de Express
 const muestrasController = require('../controllers/muestras.controller'); // Se importa el controlador de muestras 
 const authMiddleware = require('../middlewares/auth.middleware'); // Se importa el middleware de autenticación para proteger las rutas
 
-router.get('/siguienteId', authMiddleware, muestrasController.ultimoIdMuestra); // Ruta GET para obtener el siguiente ID disponible para muestras
+router.get('/siguienteId', authMiddleware, muestrasController.siguienteIdMuestra); // Ruta GET para obtener el siguiente ID disponible para muestras
+router.post('/', authMiddleware, muestrasController.almacenarMuestra); // Ruta POST para crear una nueva muestra
 
 module.exports = router; // Se exporta el enrutador
