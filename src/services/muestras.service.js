@@ -55,17 +55,6 @@ exports.almacenarMuestra = async (muestra) => {
       cedula_brigadista: muestra.cedula_brigadista,
     };
 
-    /*
-    idMuestra,
-      tamanoIndividuo,
-      nombreComun,
-      determinacionCampo,
-      observaciones,
-      numeroColeccion,
-      arbol,
-      cedula_brigadista,
-     */
-
     // Almacena la muestra en la base de datos
     const { data, error } = await supabase
       .from("muestra")
