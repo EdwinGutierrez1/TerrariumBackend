@@ -170,9 +170,11 @@ exports.sincronizarSubparcelas = async (subparcelasCaracteristicas) => {
   }
 };
 
-exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
+
+
+// Función para obtener el ID de una subparcela por su nombre y conglomerado
+exports.getSubparcelaId = async (nombreSubparcela, conglomeradoId) => {
   try {
-    // Obtener ID de la subparcela
     const { data: subparcelaData, error: subparcelaError } = await supabase
       .from("subparcela")
       .select("id")
@@ -182,7 +184,20 @@ exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
 
     if (subparcelaError) throw subparcelaError;
 
-    const subparcelaId = subparcelaData.id;
+    return subparcelaData.id;
+  } catch (error) {
+    console.error("Error al obtener ID de la subparcela:", error);
+    throw error;
+  }
+};
+
+
+
+// Función modificada para usar getSubparcelaId
+exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
+  try {
+    // Obtener ID de la subparcela usando la función separada
+    const subparcelaId = await this.getSubparcelaId(nombreSubparcela, conglomeradoId);
     console.log("ID de la subparcela:", subparcelaId);
 
     // Obtener árboles asociados a esa subparcela
@@ -204,21 +219,23 @@ exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
   }
 };
 
+
 exports.getCaracteristicasByIdSubparcela = async (
   nombreSubparcela,
   idConglomerado
 ) => {
   try {
-    const { data: subparcelaData, error: subparcelaError } = await supabase
+    // Obtener ID de la subparcela usando la función separada
+    const subparcelaId = await this.getSubparcelaId(nombreSubparcela, idConglomerado);
+    
+    // Obtener los datos completos de la subparcela
+    const { data: subparcelaData, error: subparcelaCompleteError } = await supabase
       .from("subparcela")
       .select("*")
-      .eq("nombre_subparcela", nombreSubparcela)
-      .eq("id_conglomerado", idConglomerado)
-      .single(); // Solo un resultado esperado
-
-    if (subparcelaError) throw subparcelaError;
-
-    const subparcelaId = subparcelaData.id;
+      .eq("id", subparcelaId)
+      .single();
+      
+    if (subparcelaCompleteError) throw subparcelaCompleteError;
 
     // Obtener coberturas asociadas a la subparcela
     const { data: coberturas, error: coberturaError } = await supabase
