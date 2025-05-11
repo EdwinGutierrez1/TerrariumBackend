@@ -5,7 +5,7 @@ const supabase = require("../config/supabase.config");
     try {
         // Realiza una consulta a la tabla individuo para obtener el último ID
         const { data, error } = await supabase
-        .from("individuo")
+        .from("arbol")
         .select("id")
         .order("id", { ascending: false })
         .limit(1);
@@ -41,4 +41,24 @@ const supabase = require("../config/supabase.config");
         console.error("Error al obtener el siguiente ID:", error);
         throw error;
     }
-}
+};
+
+exports.getIndividuosByConglomerado = async (subparcelasIds) => {
+    try {
+        // Realiza una consulta a la tabla individuo para obtener los individuos que pertenecen a las subparcelas especificadas
+        const { data, error } = await supabase
+            .from("arbol")
+            .select("*")
+            .in("id_subparcela", subparcelasIds);
+        
+        if (error) {
+            console.error("Error al obtener los individuos:", error);
+            throw error;
+        }
+        
+        return data;
+    } catch (error) {
+        console.error("Error en la función getIndividuosByConglomerado:", error);
+        throw error;
+    }
+};

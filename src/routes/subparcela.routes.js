@@ -7,8 +7,9 @@ const authMiddleware = require('../middlewares/auth.middleware'); // Importamos 
 
 //Ruta POST para sincronizar datos de subparcelas
 router.post('/sincronizar', authMiddleware, subparcelaController.sincronizarSubparcelas);
-router.get('/:conglomeradoId/:nombreSubparcela', authMiddleware, subparcelaController.getArbolesSubparcela); // Ruta para obtener árboles de una subparcela específica
+router.get('/arboles/:conglomeradoId/:nombreSubparcela', authMiddleware, subparcelaController.getArbolesSubparcela); // Ruta para obtener árboles de una subparcela específica
 router.get('/caracteristicas/:conglomeradoId/:nombreSubparcela', authMiddleware, subparcelaController.getCaracteristicasSubparcela); // Ruta para obtener características de una subparcela específica
+router.get('/idsSubparcelas/:conglomeradoId', authMiddleware, subparcelaController.getIdsSubparcelasByConglomerado); // Ruta para obtener IDs de subparcelas por ID de conglomerado
 
 // Exportamos el router para ser utilizado en app.js
 module.exports = router;

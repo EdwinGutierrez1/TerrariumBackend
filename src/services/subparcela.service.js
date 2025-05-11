@@ -263,3 +263,21 @@ exports.getCaracteristicasByIdSubparcela = async (
     throw error;
   }
 };
+
+exports.getSubparcelasIdByConglomerado = async (conglomeradoId) => {
+  console.log("Ingreso al servicio del id");
+  try {
+    // Obtener ID de las subparcelas asociadas al conglomerado
+    const { data: subparcelas, error: subparcelaError } = await supabase
+      .from("subparcela")
+      .select("id")
+      .eq("id_conglomerado", conglomeradoId);
+
+    if (subparcelaError) throw subparcelaError;
+
+    return subparcelas.map((subparcela) => subparcela.id);
+  } catch (error) {
+    console.error("Error al obtener IDs de subparcelas:", error);
+    throw error;
+  }
+}

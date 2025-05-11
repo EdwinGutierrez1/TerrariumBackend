@@ -7,4 +7,7 @@ const authMiddleware = require('../middlewares/auth.middleware');
 // Ruta GET para obtener el siguiente ID disponible para individuos
 router.get('/siguienteId', authMiddleware, individuosController.siguienteIdIndividuo);
 
+// Modificado: Cambio de parámetro de ruta a query parameter para los IDs de subparcelas
+router.get('/conglomerado', authMiddleware, individuosController.getIndividuosByConglomerado);
+
 module.exports = router;

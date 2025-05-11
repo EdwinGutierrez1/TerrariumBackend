@@ -116,3 +116,37 @@ exports.getCaracteristicasSubparcela = async (req, res) => {
         });
     }
 };
+
+exports.getIdsSubparcelasByConglomerado = async (req, res) => {
+  console.log("getIdsSubparcelasByConglomerado controller");
+  try {
+    const { conglomeradoId } = req.params; // Desestructuramos los parámetros de la solicitud
+
+    // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+    if (!conglomeradoId) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Faltan parámetros necesarios para obtener ID de subparcelas por conglomerado",
+      });
+    }
+
+    // Se ejecuta el servicio correspondiente para obtener los ID de las subparcelas
+    const subparcelasIds = await subparcelaService.getSubparcelasIdByConglomerado(
+      conglomeradoId
+    );
+    // Responde con éxito y los datos obtenidos
+    return res.status(200).json({
+      success: true,
+      data: subparcelasIds,
+    });
+  } catch (error) {
+    //Si se produce un error
+    console.error("Error en getSubparcelasIdByConglomerado controller:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error al obtener ID de subparcelas por conglomerado",
+      error: error.message,
+    });
+  }
+}
