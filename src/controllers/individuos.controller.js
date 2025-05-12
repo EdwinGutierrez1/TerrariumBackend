@@ -1,5 +1,6 @@
 const individuoService = require('../services/individuos.service');
 
+
 // Controlador para obtener el siguiente ID de individuo
 exports.siguienteIdIndividuo = async (req, res) => {
   try {
@@ -25,6 +26,26 @@ exports.siguienteIdIndividuo = async (req, res) => {
       });
   }
 };
+
+
+exports.guardarIndividuo = async (req, res) => {
+  try {
+    // Extraemos todos los campos necesarios del cuerpo de la petición
+    const datosIndividuo = req.body;
+
+    // Llamamos al servicio para guardar el individuo
+    const data = await individuoService.guardarIndividuo(datosIndividuo);
+
+    return res.status(200).json({ success: true, id: data });
+  } catch (error) {
+    console.error("Error en guardarIndividuo:", error);
+    return res.status(500).json({
+      success: false,
+      error: error.message || "Error al guardar el individuo",
+    });
+  }
+};
+
 
 exports.getIndividuosByConglomerado = async (req, res) => {
   try {

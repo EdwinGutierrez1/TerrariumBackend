@@ -43,6 +43,60 @@ const supabase = require("../config/supabase.config");
     }
 };
 
+
+exports.guardarIndividuo = async (individuo) => {
+    try {
+        console.log("Datos recibidos en el servicio:", individuo);
+        
+        // Verificar que todos los campos necesarios estén presentes
+        if (!individuo.subparcelaId) {
+            throw new Error("El ID de subparcela es obligatorio");
+        }
+        
+        const individuoData = {
+            id: individuo.idIndividuo,
+            tamaño_individuo: individuo.tamanoIndividuo || null,
+            condicion: individuo.condicion || null,
+            azimut: parseFloat(individuo.azimut) || null,
+            distancia_del_centro: parseFloat(individuo.distanciaCentro) || null,
+            tallo: individuo.tallo || null,
+            diametro: parseFloat(individuo.diametro) || null,
+            altura_total: parseFloat(individuo.alturaTotal) || null,
+            forma_fuste: individuo.formaFuste || null,
+            daño: individuo.dano || null,
+            penetracion: individuo.penetracion ? parseFloat(individuo.penetracion) : null,
+            id_subparcela: individuo.subparcelaId, // Asegúrate de que esto sea un ID válido
+        };
+        
+        console.log("Datos formateados para inserción:", individuoData);
+    
+        // Almacena el individuo en la tabla arbol de la base de datos
+        const { data, error } = await supabase
+            .from("arbol")
+            .insert(individuoData)
+            .select("id");
+    
+        if (error) {
+            console.error("Error específico de Supabase:", error);
+            throw new Error(`Error de Supabase: ${error.message || error.details || JSON.stringify(error)}`);
+        }
+        
+        console.log("Respuesta de Supabase:", data);
+    
+        if (!data || data.length === 0) {
+            throw new Error("No se recibió ID después de la inserción");
+        }
+        
+        return data[0].id; // Devuelve el ID del individuo almacenado
+    } catch (error) {
+        console.error("Error completo al insertar individuo:", error);
+        throw error;
+    }
+};
+
+
+
+
 exports.getIndividuosByConglomerado = async (subparcelasIds) => {
     try {
         // Realiza una consulta a la tabla individuo para obtener los individuos que pertenecen a las subparcelas especificadas
