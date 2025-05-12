@@ -264,6 +264,7 @@ exports.getCaracteristicasByIdSubparcela = async (
   }
 };
 
+
 exports.getSubparcelasIdByConglomerado = async (conglomeradoId) => {
   console.log("Ingreso al servicio del id");
   try {

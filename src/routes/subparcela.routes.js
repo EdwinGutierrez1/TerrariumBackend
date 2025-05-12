@@ -10,6 +10,7 @@ router.post('/sincronizar', authMiddleware, subparcelaController.sincronizarSubp
 router.get('/arboles/:conglomeradoId/:nombreSubparcela', authMiddleware, subparcelaController.getArbolesSubparcela); // Ruta para obtener árboles de una subparcela específica
 router.get('/caracteristicas/:conglomeradoId/:nombreSubparcela', authMiddleware, subparcelaController.getCaracteristicasSubparcela); // Ruta para obtener características de una subparcela específica
 router.get('/idsSubparcelas/:conglomeradoId', authMiddleware, subparcelaController.getIdsSubparcelasByConglomerado); // Ruta para obtener IDs de subparcelas por ID de conglomerado
+router.get('/id', authMiddleware, subparcelaController.getSubparcelaId); // Ruta para obtener ID de subparcela por nombre y conglomerado
 
 // Exportamos el router para ser utilizado en app.js
 module.exports = router;
