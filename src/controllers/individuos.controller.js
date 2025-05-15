@@ -80,6 +80,7 @@ exports.getIndividuosByConglomerado = async (req, res) => {
       success: true,
       data: individuos
     });
+    
   } catch (error) {
     console.error("Error en getIndividuosByConglomerado controller:", error);
     return res.status(500).json({
