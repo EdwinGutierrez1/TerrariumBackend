@@ -17,7 +17,7 @@ exports.obtenerSiguienteIdIndividuo = async () => {
 
         if (data.length === 0) {
             // Si no hay individuos en la tabla, el primer ID será A001
-            return "A001";
+            return "AR001";
         }
 
         // Obtener el último ID (Si data no está vacío)
@@ -25,12 +25,12 @@ exports.obtenerSiguienteIdIndividuo = async () => {
 
         // Extraer el número del ID (por ejemplo: A001 -> 1)
         // Primero eliminamos el prefijo "A" y luego convertimos la parte numérica a un número entero en base 10
-        const numeroStr = ultimoId.replace("A", "");
+        const numeroStr = ultimoId.replace("AR", "");
         const numero = parseInt(numeroStr, 10);
 
         // Verificar que el número sea válido
         if (isNaN(numero)) {
-            return "A001"; // Valor por defecto si hay un error
+            return "AR001"; // Valor por defecto si hay un error
         }
 
         // Incrementamos el número en uno para generar el siguiente ID
@@ -38,7 +38,7 @@ exports.obtenerSiguienteIdIndividuo = async () => {
 
         // Convertimos el número a string y le añadimos ceros a la izquierda hasta tener 3 dígitos
         // Luego lo concatenamos con el prefijo "A" para obtener el nuevo ID
-        const siguienteId = `A${siguienteNumero.toString().padStart(3, "0")}`;
+        const siguienteId = `AR${siguienteNumero.toString().padStart(3, "0")}`;
 
         // Devolvemos el nuevo ID generado, por ejemplo: "A002"
         return siguienteId;
