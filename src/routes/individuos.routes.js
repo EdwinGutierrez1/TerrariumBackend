@@ -1,16 +1,16 @@
-    // routes/individuos.routes.js
-    const express = require('express');
-    const router = express.Router();
-    const individuosController = require('../controllers/individuos.controller');
-    const authMiddleware = require('../middlewares/auth.middleware');
+    //LISTO
+    const express = require('express'); // Se importa el módulo de Express
+    const router = express.Router(); // Se crea un enrutador de Express
+    const individuosController = require('../controllers/individuos.controller'); // Se importa el controlador de los individuos.
+    const authMiddleware = require('../middlewares/auth.middleware');  // Se importa el middleware de autenticación.
 
     // Ruta GET para obtener el siguiente ID disponible para individuos
     router.get('/siguienteId', authMiddleware, individuosController.siguienteIdIndividuo);
 
-    // Modificado: Cambio de parámetro de ruta a query parameter para los IDs de subparcelas
+    //Ruta GET para obtener los individuos del conglomerado.
     router.get('/conglomerado', authMiddleware, individuosController.getIndividuosByConglomerado);
 
-    //ruta para guardar un individuo
+    //ruta POST para guardar un individuo
     router.post('/guardar', authMiddleware, individuosController.guardarIndividuo);
 
-    module.exports = router;
+    module.exports = router; // Se exporta el enrutador de Express.

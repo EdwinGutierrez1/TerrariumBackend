@@ -1,5 +1,4 @@
-//Controlador de Trayectos. Maneja las solicitudes HTTP relacionadas con la gestión de trayectos, asociados a puntos de referencia.
-
+//LISTO
 // Se importan los servicios necesarios
 const trayectoService = require('../services/trayecto.service');
 const referenciaService = require('../services/referencia.service');
@@ -7,21 +6,15 @@ const referenciaService = require('../services/referencia.service');
 /**
  * Guarda un nuevo trayecto asociado a un punto de referencia
  * Verifica permisos del brigadista antes de realizar la operación
- * 
- * req - Objeto de solicitud Express
- * req.body - Contiene datosTrayecto y puntoId
- * req.body.datosTrayecto - Datos del trayecto a guardar
- * req.body.puntoId - ID del punto de referencia asociado
- * res - Objeto de respuesta Express
  * retorna un objeto, que es una respuesta JSON con el resultado de la operación
  */
 
 exports.guardarTrayecto = async (req, res) => {
   try {
-    const { datosTrayecto, puntoId } = req.body;
-    const cedulaBrigadista = datosTrayecto.cedula_brigadista;
+    const { datosTrayecto, puntoId } = req.body; //Se obtienen los datos del trayecto y el ID del punto de referencia
+    const cedulaBrigadista = datosTrayecto.cedula_brigadista; //Se obtiene la cédula del brigadista
 
-    // Verificar que el punto de referencia exista
+    // Verificar que el punto de referencia exista, haciendo uso del servicio correspondiente
     const puntoReferencia = await referenciaService.obtenerReferenciaPorId(puntoId);
 
     if (!puntoReferencia) { //Si no existe
@@ -39,14 +32,13 @@ exports.guardarTrayecto = async (req, res) => {
       });
     }
 
-    // Se ejecuta el serivicio correspondiente para insertar el trayecto en la BD.
+    // Se ejecuta el servicio correspondiente para insertar el trayecto en la BD.
     const result = await trayectoService.insertarTrayecto(datosTrayecto, puntoId);
     
     // Responde con éxito y los datos del trayecto creado
     return res.status(201).json(result);
 
   } catch (error) {  //Manejo de errores
-    console.error('Error en guardarTrayecto:', error);
     return res.status(500).json({ 
       success: false, 
       error: error.message || "Error al guardar el trayecto" 
@@ -58,16 +50,13 @@ exports.guardarTrayecto = async (req, res) => {
  * Actualiza un trayecto existente asociado a un punto de referencia
  * Verifica permisos del brigadista y existencia del trayecto antes de realizar la operación
  * req - Objeto de solicitud Express
- * req.body - Contiene datosTrayecto y puntoId
- * req.body.datosTrayecto - Datos actualizados del trayecto
- * req.body.puntoId - ID del punto de referencia asociado
- * res - Objeto de respuesta Express
  * devuelve una respuesta JSON con el resultado de la operación
  */
+
 exports.actualizarTrayecto = async (req, res) => {
   try {
-    const { datosTrayecto, puntoId } = req.body;
-    const cedulaBrigadista = datosTrayecto.cedula_brigadista;
+    const { datosTrayecto, puntoId } = req.body; //Se obtienen los datos del trayecto y el ID del punto de referencia
+    const cedulaBrigadista = datosTrayecto.cedula_brigadista; //Se obtiene la cédula del brigadista
 
     // Verifica que el punto de referencia exista
     const puntoReferencia = await referenciaService.obtenerReferenciaPorId(puntoId);
@@ -106,7 +95,6 @@ exports.actualizarTrayecto = async (req, res) => {
       data: result
     });
   } catch (error) {  // Manejo de errores
-    console.error('Error en actualizarTrayecto:', error);
     return res.status(500).json({ 
       success: false, 
       error: error.message || "Error al actualizar el trayecto" 
@@ -116,29 +104,29 @@ exports.actualizarTrayecto = async (req, res) => {
 
 /**
  * Obtiene el siguiente ID disponible para un nuevo trayecto
- * req - Objeto de solicitud Express
- * res - Objeto de respuesta Express
  * devuelve una Respuesta JSON con el siguiente ID disponible
  */
+
 exports.obtenerIdTrayecto = async (req, res) => {
   try {
-    // Obtiene el siguiente ID disponible para el trayecto.
+
+    // Obtiene el siguiente ID disponible para el trayecto, usando el servicio correspondiente.
     const siguienteId = await trayectoService.obtenerSiguienteIdTrayecto();
     
-    if (!siguienteId) {
+    if (!siguienteId) { //Si no se pudo obtener el ID.
       return res.status(404).json({
         success: false,
         error: "No se pudo generar el siguiente ID para el trayecto"
       });
     }
     
-    // Responde con el ID generado
+    // Si se pudo obtener, responde con el ID generado
     return res.status(200).json({
       success: true,
       data: { siguienteId }
     });
-  } catch (error) {   // Manejo de errores
-    console.error('Error en obtenerIdTrayecto:', error);
+
+  } catch (error) {  // Manejo de errores
     return res.status(500).json({ 
       success: false, 
       error: error.message || "Error al obtener el siguiente ID de trayecto" 

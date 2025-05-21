@@ -1,28 +1,22 @@
-/**
- * Controlador de Subparcelas
- * Este archivo maneja las solicitudes HTTP relacionadas con la funcionalidad de subparcelas.
- */
-
+//LISTO
 // Se importa el servicio que contiene la lógica relacionada a las subparcelas
 const subparcelaService = require("../services/subparcela.service");
 
 /**
  * Sincroniza las subparcelas recibidas desde el cliente con la base de datos
- * req - Objeto de solicitud Express
- * req.body - Contiene un objeto donde cada clave es un ID de subparcela y cada valor contiene las características (coberturas y afectaciones)
- * res - Objeto de respuesta Express
  * devuelve un objeto, que es una respuesta JSON con el estado de la sincronización y datos resultantes
  */
+
 exports.sincronizarSubparcelas = async (req, res) => {
   try {
-    const subparcelasCaracteristicas = req.body;
+    const subparcelasCaracteristicas = req.body; // Datos de las subparcelas recibidos desde el cliente
 
     // Validación: Verifica que se hayan proporcionado datos para sincronizar
     if (
       !subparcelasCaracteristicas ||
       Object.keys(subparcelasCaracteristicas).length === 0
     ) {
-      return res.status(400).json({
+      return res.status(400).json({ //Si no se proporcionaron datos, respondemos con un error 400
         success: false,
         message: "No se proporcionaron datos de subparcelas para sincronizar",
       });
@@ -38,9 +32,7 @@ exports.sincronizarSubparcelas = async (req, res) => {
       success: true,
       data: resultados,
     });
-  } catch (error) {
-    // Manejo de errores
-    console.error("Error en sincronizarSubparcelas controller:", error);
+  } catch (error) {     // Manejo de errores
     return res.status(500).json({
       success: false,
       message: "Error al sincronizar subparcelas",
@@ -49,11 +41,16 @@ exports.sincronizarSubparcelas = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene los árboles de una subparcela específica
+ * devuelve una Respuesta JSON con los árboles de la subparcela o un mensaje de error
+ */
+
 exports.getArbolesSubparcela = async (req, res) => {
   try {
-    const { nombreSubparcela, conglomeradoId } = req.params; // Desestructuramos los parámetros de la solicitud
+    const { nombreSubparcela, conglomeradoId } = req.params; // Parámetros de la ruta
 
-    // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+    // Validación de parámetros requeridos
     if (!nombreSubparcela || !conglomeradoId) {
       return res.status(400).json({
         success: false,
@@ -62,19 +59,18 @@ exports.getArbolesSubparcela = async (req, res) => {
       });
     }
 
-    // Se ejecuta el servicio correspondiente para obtener los árboles de la subparcela
+    // Obtiene los árboles de la subparcela mediante el servicio correspondiente. Se le pasan como parámetros el nombre de la subparcela y el ID del conglomerado.
     const arboles = await subparcelaService.getArbolesSubparcela(
       nombreSubparcela,
       conglomeradoId
     );
-    // Responde con éxito y los datos obtenidos
+    
+    // Responde con los datos obtenidos
     return res.status(200).json({
       success: true,
       data: arboles,
     });
-  } catch (error) {
-    //Si se produce un error
-    console.error("Error en getArbolesSubparcela controller:", error);
+  } catch (error) {     // Manejo de errores
     return res.status(500).json({
       success: false,
       message: "Error al obtener árboles de la subparcela",
@@ -83,47 +79,54 @@ exports.getArbolesSubparcela = async (req, res) => {
   }
 };
 
+/**
+ * Obtiene las características de una subparcela específica
+* Devuelve una respuesta JSON con las características de la subparcela o un mensaje de error
+ */
 exports.getCaracteristicasSubparcela = async (req, res) => {
     try {
-        const { nombreSubparcela, conglomeradoId } = req.params; // Desestructuramos los parámetros de la solicitud
-    
-        // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+        const { nombreSubparcela, conglomeradoId } = req.params; // Parámetros de la ruta
+
+        // Validación de parámetros requeridos
         if (!nombreSubparcela || !conglomeradoId) {
-        return res.status(400).json({
-            success: false,
-            message:
-            "Faltan parámetros necesarios para obtener características de la subparcela",
-        });
+          return res.status(400).json({
+              success: false,
+              message:
+              "Faltan parámetros necesarios para obtener características de la subparcela",
+          });
         }
     
-        // Se ejecuta el servicio correspondiente para obtener las características de la subparcela
+        // Obtiene las características de la subparcela mediante el servicio correspondiente. Se le pasan como parámetros el nombre de la subparcela y el ID del conglomerado.
         const caracteristicas = await subparcelaService.getCaracteristicasByIdSubparcela(
-        nombreSubparcela,
-        conglomeradoId
+          nombreSubparcela,
+          conglomeradoId
         );
-        // Responde con éxito y los datos obtenidos
+        
+        // Responde con los datos obtenidos
         return res.status(200).json({
-        success: true,
-        data: caracteristicas,
+          success: true,
+          data: caracteristicas,
         });
+
     } catch (error) {
-        //Si se produce un error
-        console.error("Error en getCaracteristicasSubparcela controller:", error);
+        // Manejo de errores
         return res.status(500).json({
-        success: false,
-        message: "Error al obtener características de la subparcela",
-        error: error.message,
+          success: false,
+          message: "Error al obtener características de la subparcela",
+          error: error.message,
         });
     }
 };
 
-
-// Para obtener el id de una subparcela dado su nombre y el id del conglomerado
+/**
+ * Obtiene el ID de una subparcela a partir de su nombre y el ID del conglomerado
+* Devuelve una respuesta JSON con el ID de la subparcela o un mensaje de error
+ */
 exports.getSubparcelaId = async (req, res) => {
   try {
-    const { nombreSubparcela, conglomeradoId } = req.query; // Obtén los parámetros de la consulta
+    const { nombreSubparcela, conglomeradoId } = req.query; //parámetros de la ruta
 
-    // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+    // Validación de parámetros requeridos
     if (!nombreSubparcela || !conglomeradoId) {
       return res.status(400).json({
         success: false,
@@ -131,19 +134,19 @@ exports.getSubparcelaId = async (req, res) => {
       });
     }
 
-    // Se ejecuta el servicio correspondiente para obtener el ID de la subparcela
+    // Obtiene el ID de la subparcela mediante el servicio correspondiente. Se pasan como parámetros el nombre de la subparcela y el ID del conglomerado.
     const id = await subparcelaService.getSubparcelaId(
       nombreSubparcela,
       conglomeradoId
     );
     
-    // Responde con éxito y el ID obtenido
+    // Responde con el ID obtenido
     return res.status(200).json({
       success: true,
       id: id,
     });
-  } catch (error) {
-    console.error("Error en getSubparcelaId controller:", error);
+
+  } catch (error) { // Manejo de errores 
     return res.status(500).json({
       success: false,
       message: "Error al obtener ID de subparcela",
@@ -152,13 +155,15 @@ exports.getSubparcelaId = async (req, res) => {
   }
 };
 
-
+/**
+ * Obtiene los IDs de todas las subparcelas pertenecientes a un conglomerado específico
+ * devuelve una respuesta JSON con los IDs de las subparcelas o un mensaje de error
+ */
 exports.getIdsSubparcelasByConglomerado = async (req, res) => {
-  console.log("getIdsSubparcelasByConglomerado controller");
   try {
-    const { conglomeradoId } = req.params; // Desestructuramos los parámetros de la solicitud
+    const { conglomeradoId } = req.params; // Parámetros de la ruta
 
-    // Validación: Verifica que se hayan proporcionado los parámetros necesarios
+    // Validación de parámetros requeridos
     if (!conglomeradoId) {
       return res.status(400).json({
         success: false,
@@ -167,22 +172,23 @@ exports.getIdsSubparcelasByConglomerado = async (req, res) => {
       });
     }
 
-    // Se ejecuta el servicio correspondiente para obtener los ID de las subparcelas
+    // Obtiene los IDs de las subparcelas mediante el servicio correspondiente. Se pasa como parámetro el ID del conglomerado.	
     const subparcelasIds = await subparcelaService.getSubparcelasIdByConglomerado(
       conglomeradoId
     );
-    // Responde con éxito y los datos obtenidos
+    
+    // Responde con los datos obtenidos
     return res.status(200).json({
       success: true,
       data: subparcelasIds,
     });
+
   } catch (error) {
-    //Si se produce un error
-    console.error("Error en getSubparcelasIdByConglomerado controller:", error);
+    // Manejo de errores
     return res.status(500).json({
       success: false,
       message: "Error al obtener ID de subparcelas por conglomerado",
       error: error.message,
     });
   }
-}
+};

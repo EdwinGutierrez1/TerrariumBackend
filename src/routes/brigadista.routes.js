@@ -1,3 +1,4 @@
+//LISTO
 const express = require('express'); //Importamos Express para poder usar su router
 const router = express.Router(); //Creamos una instancia del router
 const brigadistaController = require('../controllers/brigadista.controller'); // Importamos el controlador que contiene la lógica para las rutas de brigadista

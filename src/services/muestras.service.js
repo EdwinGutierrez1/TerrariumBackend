@@ -1,75 +1,77 @@
-const supabase = require("../config/supabase.config");
+//LISTO
+const supabase = require("../config/supabase.config"); // Se importa el módulo de configuración de Supabase
 
 exports.obtenerSiguienteIdMuestra = async () => {
   try {
-    // Realiza una consulta a la tabla punto_referencia para obtener el último ID
+
+    // Realiza una consulta a la tabla muestra para obtener el último ID
     const { data, error } = await supabase
       .from("muestra")
       .select("id")
-      .order("id", { ascending: false })
-      .limit(1);
+      .order("id", { ascending: false }) // Orden descendente para obtener el último ID
+      .limit(1); // Limitamos a un registro para obtener SOLO el último ID
 
-    if (error) {
-      console.error("Error al obtener el último ID:", error);
+    if (error) { //Si ocurre un error en la consulta
       throw error;
     }
 
     if (data.length === 0) {
-      // Si no hay puntos en la tabla, el primer ID será PR001
+      // Si no hay muestras registradas en la tabla, el primer ID será M001
       return "M001";
     }
 
     // Obtener el último ID
     const ultimoId = data[0].id;
 
-    // Extraer el número del ID (por ejemplo: PR001 -> 1)
-    // Primero eliminamos el prefijo "PR" y luego convertimos la parte numérica a un número entero en base 10
+    // Extraer el número del ID (por ejemplo: M001 -> 1)
+    // Primero eliminamos el prefijo "M" y luego convertimos la parte numérica a un número entero en base 10
     const numero = parseInt(ultimoId.replace("M", ""), 10);
 
     // Incrementamos el número en uno para generar el siguiente ID
     const siguienteNumero = numero + 1;
 
     // Convertimos el número a string y le añadimos ceros a la izquierda hasta tener 3 dígitos
-    // Luego lo concatenamos con el prefijo "PR" para obtener el nuevo ID
+    // Luego lo concatenamos con el prefijo "M" para obtener el nuevo ID
     const siguienteId = `M${siguienteNumero.toString().padStart(3, "0")}`;
 
-    // Devolvemos el nuevo ID generado, por ejemplo: "PR002"
+    // Devolvemos el nuevo ID generado, por ejemplo: "M002"
     return siguienteId;
   } catch (error) {
     //Si ocurre algún error en la función
-    console.error("Error al obtener el siguiente ID:", error);
     throw error;
   }
 };
 
 exports.almacenarMuestra = async (muestra) => {
   try {
+    // Se crea un objeto con los campos necesarios para la base de datos, mapeando desde el objeto muestra original a la estructura esperada por la tabla
     const muestraData = {
-      id: muestra.idMuestra,
-      tamaño_individuo: muestra.tamanoIndividuo,
-      nombre_comun: muestra.nombreComun,
-      determinacion: muestra.determinacionCampo,
-      observaciones: muestra.observaciones,
-      num_coleccion: muestra.numeroColeccion,
-      id_arbol: muestra.arbol,
-      cedula_brigadista: muestra.cedula_brigadista,
+      id: muestra.idMuestra,                      
+      tamaño_individuo: muestra.tamanoIndividuo,  
+      nombre_comun: muestra.nombreComun,          
+      determinacion: muestra.determinacionCampo,  
+      observaciones: muestra.observaciones,       
+      num_coleccion: muestra.numeroColeccion,    
+      id_arbol: muestra.arbol,                    
+      cedula_brigadista: muestra.cedula_brigadista, 
     };
 
-    // Almacena la muestra en la base de datos
+    // Se ejecuta la operación de inserción en la tabla "muestra" de Supabase
+    // y se solicita que devuelva el ID del registro insertado
     const { data, error } = await supabase
       .from("muestra")
       .insert(muestraData)
       .select("id");
 
+    // Manejo de errores de la operación con Supabase
     if (error) {
-      console.error("Error al almacenar la muestra:", error);
-      throw error;
+      throw error; // Se propaga el error.
     }
 
-    return data[0].id; // Devuelve el ID de la muestra almacenada
+    // Si todo sale bien, se retorna el ID de la muestra que fue insertada
+    return data[0].id;
   } catch (error) {
-    //Si ocurre un error en la ejecución de la función
-    console.error("Error al insertar muestra:", error);
-    throw error;
+    // Captura cualquier error que pueda ocurrir durante la ejecución
+    throw error; // Se propaga el error.
   }
 };

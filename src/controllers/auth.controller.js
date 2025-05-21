@@ -1,3 +1,4 @@
+//LISTO//
 const authService = require('../services/auth.service'); // Se importa el módulo de servicios de autenticación, para poder usar las funciones definidas en auth.service.js
 
 /**
@@ -16,15 +17,12 @@ exports.login = async (req, res) => {
     const {idToken } = req.body;
     
     // Validación de datos de entrada
-    if (!idToken) { //Si no hay ningpún token o está vacío.
-      console.log("Error: No se proporcionó token");
-      return res.status(400).json({ message: "Token de Firebase requerido" });
+    if (!idToken) {    //Si no hay ningún token o está vacío.
+      return res.status(400).json({ message: "Token de Firebase requerido" }); //Se arroja un mensaje de error
     }
     
     // Verificación del token y obtención de datos
-    console.log("Verificando token con Firebase Admin...");
     const userData = await authService.verifyAndGetUserData(idToken); // Se usa la función verifyAndGetUserData del archivo auth.service, pasándole como parametro el token.
-    console.log("Token verificado correctamente, datos obtenidos:", { uid: userData.uid, email: userData.email });
     
     // Respuesta exitosa - envía como respuesta el objeto userData convertido a formato JSON
     res.status(200).json(userData);
@@ -32,7 +30,6 @@ exports.login = async (req, res) => {
   } catch (error) {
 
     // Manejo de errores de autenticación
-    console.error("Error en login:", error.message);
     res.status(401).json({ message: error.message });
   }
 };
@@ -48,18 +45,15 @@ exports.login = async (req, res) => {
 
 exports.getUserName = async (req, res) => {
   const { uid } = req.params;
-  console.log(`Solicitud de nombre para usuario: ${uid}`);
   
   try {
 
     // Obtención del nombre desde el servicio
     const nombre = await authService.getUserNameByUID(uid);  // Se usa la función getUserNameByUID del archivo auth.service, pasándole como parametro el UID.
-    console.log(`Nombre encontrado para ${uid}: ${nombre}`);
     res.status(200).json({ nombre });
 
   } catch (error) {
     // Manejo de errores cuando no se encuentra el usuario
-    console.error(`Error al buscar nombre para ${uid}:`, error.message);
     res.status(404).json({ message: error.message });
   }
 };
@@ -73,7 +67,6 @@ exports.getUserName = async (req, res) => {
 
 exports.logout = async (req, res) => {
   
-    // Simplemente respondemos con éxito
-    console.log("Petición de logout recibida");
+    // Simplemente respondemos con un mensaje de confirmación.
     return res.status(200).json({ message: 'Sesión cerrada correctamente' });
 };

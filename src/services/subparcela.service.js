@@ -1,5 +1,4 @@
-//Servicio de Subparcelas y sus características
-
+//LISTO
 const supabase = require("../config/supabase.config"); // Importamos la configuración de conexión a Supabase
 
 /**
@@ -13,16 +12,16 @@ exports.getLastCoberturaNumber = async () => {
     .from("cobertura")
     .select("id")
     .order("id", { ascending: false })
-    .limit(1);
+    .limit(1); // Solo un resultado esperado
 
-  if (error) throw error;
+  if (error) throw error; //Si se produce un error.
 
   // Extrae el número del ID (ej: de "C001" obtiene 1)
   if (data && data.length > 0) {
     const lastId = data[0].id;
     return parseInt(lastId.substring(1), 10); // Quita la "C" inicial y convierte a entero
   } else {
-    return 0; // Si no hay registros, comienza desde 0
+    return 0; // Si no hay registros
   }
 };
 
@@ -43,7 +42,7 @@ exports.insertCoberturas = async (coberturas, idSubparcela) => {
     for (const cobertura of coberturas) {
       lastNumber += 1;
       const id = `C${String(lastNumber).padStart(3, "0")}`;
-      coberturasData.push({
+      coberturasData.push({ //Se añade al array.
         id,
         nombre: cobertura.tipo,
         porcentaje: parseInt(cobertura.porcentaje, 10),
@@ -56,25 +55,20 @@ exports.insertCoberturas = async (coberturas, idSubparcela) => {
 
     if (error) throw error;
 
-    return coberturasData;
-  } catch (error) {
-    //Si se produjo un error.
-    console.error("Error al insertar coberturas:", error);
+    return coberturasData; //Retorna el array de las coberturas insertadas.
+  } catch (error) {     //Si se produjo un error.
     throw error;
   }
 };
 
-/**
- * Obtiene el último número de alteración registrado para generar IDs secuenciales
- * retorna el número de la última alteración o 0 si no hay registros
- */
+//Obtiene el último número de alteración registrado para generar IDs secuenciales
 
 exports.getLastAlteracionNumber = async () => {
   const { data, error } = await supabase
     .from("alteracion")
     .select("id")
-    .order("id", { ascending: false })
-    .limit(1);
+    .order("id", { ascending: false }) // Ordenar por ID de forma descendente
+    .limit(1); // Solo un resultado esperado
 
   if (error) throw error;
 
@@ -93,6 +87,7 @@ exports.getLastAlteracionNumber = async () => {
  *  idSubparcela - ID de la subparcela a la que se asociarán las alteraciones
  *  devuelve un array con las alteraciones insertadas con sus IDs generados
  */
+
 exports.insertAlteraciones = async (afectaciones, idSubparcela) => {
   try {
     const alteracionesData = [];
@@ -103,7 +98,7 @@ exports.insertAlteraciones = async (afectaciones, idSubparcela) => {
     for (const afectacion of afectaciones) {
       lastNumber += 1;
       const id = `A${String(lastNumber).padStart(3, "0")}`;
-      alteracionesData.push({
+      alteracionesData.push({ //Se añade al array.
         id,
         nombre: afectacion.tipo,
         severidad: afectacion.severidad,
@@ -115,12 +110,11 @@ exports.insertAlteraciones = async (afectaciones, idSubparcela) => {
     const { error } = await supabase
       .from("alteracion")
       .insert(alteracionesData);
+
     if (error) throw error;
 
-    return alteracionesData;
-  } catch (error) {
-    //Si se produce un error
-    console.error("Error al insertar alteraciones:", error);
+    return alteracionesData; //Devuelve el array
+  } catch (error) {     //Si se produce un error.
     throw error;
   }
 };
@@ -131,6 +125,7 @@ exports.insertAlteraciones = async (afectaciones, idSubparcela) => {
  * subparcelasCaracteristicas - Objeto donde cada clave es un ID de subparcela y cada valor contiene arrays de coberturas y afectaciones
  * retorna un objeto con los resultados de la sincronización con las coberturas y alteraciones insertadas
  */
+
 exports.sincronizarSubparcelas = async (subparcelasCaracteristicas) => {
   try {
     // Objeto para almacenar todos los resultados de la sincronización
@@ -149,7 +144,7 @@ exports.sincronizarSubparcelas = async (subparcelasCaracteristicas) => {
           subparcela.coberturas,
           idSubparcela
         );
-        resultados.coberturas.push(...coberturas);
+        resultados.coberturas.push(...coberturas); //Se añade a la constante "resultados"
       }
 
       // Inserta alteraciones si existen para esta subparcela
@@ -158,19 +153,16 @@ exports.sincronizarSubparcelas = async (subparcelasCaracteristicas) => {
           subparcela.afectaciones,
           idSubparcela
         );
-        resultados.alteraciones.push(...alteraciones);
+        resultados.alteraciones.push(...alteraciones); //Se añade a la constante "resultados"
       }
     }
 
     return resultados;
-  } catch (error) {
-    //Si ocurre un error
-    console.error("Error al sincronizar subparcelas:", error);
+
+  } catch (error) {  //Si ocurre un error
     throw error;
   }
 };
-
-
 
 // Función para obtener el ID de una subparcela por su nombre y conglomerado
 exports.getSubparcelaId = async (nombreSubparcela, conglomeradoId) => {
@@ -182,23 +174,22 @@ exports.getSubparcelaId = async (nombreSubparcela, conglomeradoId) => {
       .eq("id_conglomerado", conglomeradoId)
       .single(); // Solo un resultado esperado
 
-    if (subparcelaError) throw subparcelaError;
+    if (subparcelaError) throw subparcelaError; //Si se produce un error.
 
-    return subparcelaData.id;
-  } catch (error) {
-    console.error("Error al obtener ID de la subparcela:", error);
+    return subparcelaData.id; //Retornamos el id de la subparcela.
+
+  } catch (error) { //Manejo de errores 
     throw error;
   }
 };
 
 
-
-// Función modificada para usar getSubparcelaId
+// Función para obtener los árboles asociados a una subparcela en específico.
 exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
   try {
+
     // Obtener ID de la subparcela usando la función separada
     const subparcelaId = await this.getSubparcelaId(nombreSubparcela, conglomeradoId);
-    console.log("ID de la subparcela:", subparcelaId);
 
     // Obtener árboles asociados a esa subparcela
     const { data: arboles, error: arbolError } = await supabase
@@ -213,13 +204,12 @@ exports.getArbolesSubparcela = async (nombreSubparcela, conglomeradoId) => {
       subparcelaId,
       arboles,
     };
-  } catch (error) {
-    console.error("Error al obtener árboles de la subparcela:", error);
+  } catch (error) { //Manejo de errores
     throw error;
   }
 };
 
-
+// Funcion para obtener las características de una subparcela por su nombre y el id del conglomerado al que pertenece
 exports.getCaracteristicasByIdSubparcela = async (
   nombreSubparcela,
   idConglomerado
@@ -253,22 +243,21 @@ exports.getCaracteristicasByIdSubparcela = async (
 
     if (alteracionError) throw alteracionError;
 
-    return {
+    return { //Retornamos los datos de la subparcela, las coberturas y las alteraciones
       subparcelaData,
       coberturas,
       alteraciones,
     };
-  } catch (error) {
-    console.error("Error al obtener características de la subparcela:", error);
+
+  } catch (error) { //Manejo de errores
     throw error;
   }
 };
 
-
+//Funcion para obtener los id's de todas las subparcelas asociadas a un conglomerado en específico.
 exports.getSubparcelasIdByConglomerado = async (conglomeradoId) => {
-  console.log("Ingreso al servicio del id");
   try {
-    // Obtener ID de las subparcelas asociadas al conglomerado
+    // Obtener los ID's de las subparcelas asociadas al conglomerado, mediante una consulta a la base de datos.
     const { data: subparcelas, error: subparcelaError } = await supabase
       .from("subparcela")
       .select("id")
@@ -276,9 +265,8 @@ exports.getSubparcelasIdByConglomerado = async (conglomeradoId) => {
 
     if (subparcelaError) throw subparcelaError;
 
-    return subparcelas.map((subparcela) => subparcela.id);
-  } catch (error) {
-    console.error("Error al obtener IDs de subparcelas:", error);
+    return subparcelas.map((subparcela) => subparcela.id); //Retornamos los id's de las subparcelas, en un array.
+  } catch (error) { //Manejo de errores
     throw error;
   }
 }

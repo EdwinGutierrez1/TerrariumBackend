@@ -1,5 +1,4 @@
-//Servicio de Trayectos. Incluye generación de IDs, inserción, actualización y consultas.
-
+//LISTO
 const supabase = require('../config/supabase.config'); // Se importa la configuración de conexión a Supabase 
 
 /**
@@ -7,6 +6,7 @@ const supabase = require('../config/supabase.config'); // Se importa la configur
  * Los IDs siguen el formato 'TR' seguido de un número de 3 dígitos (ej: TR001, TR002...)
  * retorna el siguiente ID disponible.
  */
+
 const obtenerSiguienteIdTrayecto = async () => {
     try {
       // Realizamos una consulta para obtener el último ID de trayecto
@@ -17,7 +17,6 @@ const obtenerSiguienteIdTrayecto = async () => {
         .limit(1);  // Tomamos solo el último
   
       if (error) {
-        console.error("Error al obtener el último ID de trayecto:", error);
         return null;  // Si ocurre un error, retornamos null
       }
   
@@ -38,24 +37,23 @@ const obtenerSiguienteIdTrayecto = async () => {
       // Formatear el número con ceros a la izquierda para mantener 3 dígitos
       const siguienteId = `TR${siguienteNumero.toString().padStart(3, '0')}`;
   
-      return siguienteId;
+      return siguienteId; //Se retorna el siguiente ID de trayecto
     } catch (error) {
-      console.error("Error al obtener el siguiente ID de trayecto:", error);
       return null;  // Si ocurre un error, retornamos null
     }
   };
   
 /**
  * Inserta un nuevo trayecto en la base de datos
- * trayecto - objetos con los datos del trayecto a insertar
  * retorna el resultado de la operación con los datos insertados o arroja un error si se presenta.
  */
+
 const insertarTrayecto = async (trayecto, idReferencia) => {
     try {
-      // Obtiene el siguiente ID disponible
+      // Obtiene el siguiente ID disponible, haciendo uso de la función definida anteriormente
       const siguienteId = await obtenerSiguienteIdTrayecto();
       
-      if (!siguienteId) {
+      if (!siguienteId) { //Si no se obtuvo el id
         throw new Error("No se pudo generar el siguiente ID para el trayecto");
       }
   
@@ -72,8 +70,7 @@ const insertarTrayecto = async (trayecto, idReferencia) => {
         .from('trayecto')
         .insert([
           {
-            id: siguienteId,
-            // Mapea los datos de camelCase a snake_case para la base de datos
+            id: siguienteId,          
             medio_transporte: medioTransporte,
             duracion,
             distancia,
@@ -82,21 +79,19 @@ const insertarTrayecto = async (trayecto, idReferencia) => {
         ])
         .select(); // Selecciona los datos insertados para devolverlos
   
-      if (error) throw error;
+      if (error) throw error; //Si se produce error
   
-      console.log("Trayecto insertado correctamente con ID:", siguienteId);
-      return { success: true, data: { id: siguienteId, ...data[0] } };
-    } catch (error) {
-      console.error("Error al insertar el trayecto:", error);
+      return { success: true, data: { id: siguienteId, ...data[0] } }; //Se retorna el resultado de la operación
+    } catch (error) { //manejo de errores
       throw error;
     }
   };
 
 /**
  * Actualiza un trayecto existente en la base de datos
- * Trayecto - objeto con los datos actualizados del trayecto
  * retorna el resultado de la operación con los datos insertados o arroja un error si se presenta.
  */
+
 const actualizarTrayecto = async (trayecto, referenciaId) => {
     try {
       // Destructura los datos relevantes del objeto trayecto
@@ -117,11 +112,10 @@ const actualizarTrayecto = async (trayecto, referenciaId) => {
         })
         .eq("id_punto_referencia", referenciaId); // Filtra por el punto de referencia
   
-      if (error) throw error;
+      if (error) throw error; //Si se produce error
   
-      return { success: true, data };
-    } catch (err) {
-      console.error("Error al actualizar el trayecto:", err);
+      return { success: true, data }; //Se retorna el resultado de la operación
+    } catch (err) { //Manejo de errores
       throw err;
     }
   };
@@ -129,9 +123,9 @@ const actualizarTrayecto = async (trayecto, referenciaId) => {
   
 /**
  * Busca un trayecto por su ID en la base de datos
- * id - ID del trayecto a buscar (formato 'TR001')
  * retorna los datos del trayecto encontrado o null si no existe
  */
+
 const obtenerTrayectoPorId = async (id) => {
     try {
       // Consulta el trayecto por su ID
@@ -149,14 +143,14 @@ const obtenerTrayectoPorId = async (id) => {
         throw error;
       }
       
-      return data;
-    } catch (error) {
-      console.error('Error al obtener trayecto:', error);
+      return data; //Retornamos el trayecto encontrado
+    } catch (error) { //Manejo de errores
       throw error;
     }
   };
 
-// Exporta las funciones del servicio para ser utilizadas por el controlador
+// Exportamos las funciones del servicio para ser utilizadas por el controlador
+// En este caso la exportación de las funciones se hace se hace al final del archivo, en lugar de exportar cada función al definilarla, cualquiera de las dos formas es válida.
 module.exports = {
     obtenerSiguienteIdTrayecto,
     insertarTrayecto,

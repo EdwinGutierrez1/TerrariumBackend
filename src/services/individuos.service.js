@@ -1,4 +1,5 @@
-const supabase = require("../config/supabase.config");
+//LISTO
+const supabase = require("../config/supabase.config"); //Se importa el módulo de configuración para supabase.
 
 // Función para obtener el siguiente ID de individuo (árbol)
 exports.obtenerSiguienteIdIndividuo = async () => {
@@ -7,11 +8,10 @@ exports.obtenerSiguienteIdIndividuo = async () => {
         const { data, error } = await supabase
             .from("arbol")
             .select("id")
-            .order("id", { ascending: false })
-            .limit(1);
+            .order("id", { ascending: false }) // Orden descendente para obtener el último ID
+            .limit(1); // Limitamos a 1 para obtener solo el último ID
 
-        if (error) {
-            console.error("Error al obtener el último ID:", error);
+        if (error) { //Si hay un error
             throw error;
         }
 
@@ -20,7 +20,7 @@ exports.obtenerSiguienteIdIndividuo = async () => {
             return "A001";
         }
 
-        // Obtener el último ID
+        // Obtener el último ID (Si data no está vacío)
         const ultimoId = data[0].id;
 
         // Extraer el número del ID (por ejemplo: A001 -> 1)
@@ -30,7 +30,6 @@ exports.obtenerSiguienteIdIndividuo = async () => {
 
         // Verificar que el número sea válido
         if (isNaN(numero)) {
-            console.error("Error: El ID recuperado no tiene el formato esperado:", ultimoId);
             return "A001"; // Valor por defecto si hay un error
         }
 
@@ -45,12 +44,9 @@ exports.obtenerSiguienteIdIndividuo = async () => {
         return siguienteId;
     } catch (error) {
         // Si ocurre algún error en la función
-        console.error("Error al obtener el siguiente ID:", error);
         throw error;
     }
 };
-
-
 
 // Función para obtener el siguiente ID de registro
 exports.obtenerSiguienteIdRegistro = async () => {
@@ -59,11 +55,10 @@ exports.obtenerSiguienteIdRegistro = async () => {
         const { data, error } = await supabase
             .from("registro")
             .select("id")
-            .order("id", { ascending: false })
-            .limit(1);
+            .order("id", { ascending: false }) // Orden descendente para obtener el último ID
+            .limit(1); // Limitamos a 1 para obtener solo el último ID
 
-        if (error) {
-            console.error("Error al obtener el último ID de registro:", error);
+        if (error) { //Si hay un error
             throw error;
         }
 
@@ -81,7 +76,6 @@ exports.obtenerSiguienteIdRegistro = async () => {
 
         // Verificar que el número sea válido
         if (isNaN(numero)) {
-            console.error("Error: El ID de registro recuperado no tiene el formato esperado:", ultimoId);
             return "R001"; // Valor por defecto si hay un error
         }
 
@@ -96,7 +90,6 @@ exports.obtenerSiguienteIdRegistro = async () => {
         return siguienteId;
     } catch (error) {
         // Si ocurre algún error en la función
-        console.error("Error al obtener el siguiente ID de registro:", error);
         throw error;
     }
 };
@@ -104,14 +97,14 @@ exports.obtenerSiguienteIdRegistro = async () => {
 
 exports.guardarIndividuo = async (individuo) => {
     try {
-        console.log("Datos recibidos en el servicio:", individuo);
 
-        // Verificar que todos los campos necesarios estén presentes
+        // Verificar que el individuo tenga el id de la subparcela a la que pertenece.
         if (!individuo.subparcelaId) {
             throw new Error("El ID de subparcela es obligatorio");
         }
 
         // Preparar datos para la tabla arbol
+        // Si el individuo no tiene alguno de estos campos, se asigna null.
         const individuoData = {
             id: individuo.idIndividuo,
             tamaño_individuo: individuo.tamanoIndividuo || null,
@@ -123,26 +116,21 @@ exports.guardarIndividuo = async (individuo) => {
             altura_total: parseFloat(individuo.alturaTotal) || null,
             forma_fuste: individuo.formaFuste || null,
             daño: individuo.dano || null,
-            penetracion: individuo.penetracion ? parseFloat(individuo.penetracion) : null,
+            penetracion: individuo.penetracion ? parseFloat(individuo.penetracion) : null, 
             id_subparcela: individuo.subparcelaId,
         };
-
-        console.log("Datos formateados para inserción en arbol:", individuoData);
 
         // Almacena el individuo en la tabla arbol de la base de datos
         const { data: arbolData, error: arbolError } = await supabase
             .from("arbol")
             .insert(individuoData)
-            .select("id");
+            .select("id"); // Se selecciona el ID para usarlo después
 
-        if (arbolError) {
-            console.error("Error específico de Supabase al insertar en arbol:", arbolError);
+        if (arbolError) { //Si hay un error
             throw new Error(`Error de Supabase: ${arbolError.message || arbolError.details || JSON.stringify(arbolError)}`);
         }
 
-        console.log("Respuesta de Supabase para arbol:", arbolData);
-
-        if (!arbolData || arbolData.length === 0) {
+        if (!arbolData || arbolData.length === 0) { //Si por algún motivo no se obtuvo el id del árbol luego de insertarlo.
             throw new Error("No se recibió ID después de la inserción en arbol");
         }
 
@@ -156,50 +144,40 @@ exports.guardarIndividuo = async (individuo) => {
             angulo_vista_abajo: individuo.anguloVistoBajo ? parseFloat(individuo.anguloVistoBajo) : null,
             angulo_vista_arriba: individuo.anguloVistoAlto ? parseFloat(individuo.anguloVistoAlto) : null,
             cedula_brigadista: individuo.cedula_brigadista || null,
-            id_arbol: arbolData[0].id  // CAMBIO AQUÍ: Usar el ID devuelto por la inserción del árbol
+            id_arbol: arbolData[0].id  // Usamos el ID del árbol que acabamos de insertar
         };
-
-        console.log("Datos formateados para inserción en registro:", datosRegistro);
 
         // Almacena los datos en la tabla registro
         const { data: registroData, error: registroError } = await supabase
             .from("registro")
             .insert(datosRegistro)
-            .select("id");
+            .select("id"); // Se selecciona el ID para usarlo después
 
         if (registroError) {
-            console.error("Error específico de Supabase al insertar en registro:", registroError);
             // Aunque haya error en registro, no abortamos la operación ya que el árbol ya se guardó
-            console.warn("El árbol se guardó pero hubo un error al guardar el registro");
-        } else {
-            console.log("Respuesta de Supabase para registro:", registroData);
         }
 
         return arbolData[0].id; // Devuelve el ID del individuo almacenado
     } catch (error) {
-        console.error("Error completo al insertar individuo:", error);
         throw error;
     }
 };
 
-
-
 exports.getIndividuosByConglomerado = async (subparcelasIds) => {
     try {
-        // Realiza una consulta a la tabla individuo para obtener los individuos que pertenecen a las subparcelas especificadas
+
+        // Realiza una consulta a la tabla arbol para obtener los individuos arboreos que pertenecen a las subparcelas especificadas
         const { data, error } = await supabase
             .from("arbol")
             .select("*")
-            .in("id_subparcela", subparcelasIds);
+            .in("id_subparcela", subparcelasIds); //El valor del campo id_subparcela debe estar en el array subparcelasIds. 
 
-        if (error) {
-            console.error("Error al obtener los individuos:", error);
+        if (error) { //Si hay un error
             throw error;
         }
 
-        return data;
-    } catch (error) {
-        console.error("Error en la función getIndividuosByConglomerado:", error);
+        return data; //Devuelve los datos obtenidos
+    } catch (error) { 
         throw error;
     }
 };
