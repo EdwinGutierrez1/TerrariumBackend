@@ -87,40 +87,7 @@ const insertarTrayecto = async (trayecto, idReferencia) => {
     }
   };
 
-/**
- * Actualiza un trayecto existente en la base de datos
- * retorna el resultado de la operación con los datos insertados o arroja un error si se presenta.
- */
 
-const actualizarTrayecto = async (trayecto, referenciaId) => {
-    try {
-      // Destructura los datos relevantes del objeto trayecto
-      const { medioTransporte, duracion, distancia } = trayecto;
-  
-      // Validación del medio de transporte
-      if (!medioTransporte || medioTransporte.trim() === "") {
-        throw new Error("El campo 'medio_transporte' no puede estar vacío");
-      }
-  
-      // Actualiza el trayecto en la base de datos
-      const { data, error } = await supabase
-        .from("trayecto")
-        .update({
-          medio_transporte: medioTransporte,
-          duracion,
-          distancia,
-        })
-        .eq("id_punto_referencia", referenciaId); // Filtra por el punto de referencia
-  
-      if (error) throw error; //Si se produce error
-  
-      return { success: true, data }; //Se retorna el resultado de la operación
-    } catch (err) { //Manejo de errores
-      throw err;
-    }
-  };
-
-  
 /**
  * Busca un trayecto por su ID en la base de datos
  * retorna los datos del trayecto encontrado o null si no existe
@@ -154,6 +121,5 @@ const obtenerTrayectoPorId = async (id) => {
 module.exports = {
     obtenerSiguienteIdTrayecto,
     insertarTrayecto,
-    actualizarTrayecto,
     obtenerTrayectoPorId
 };
