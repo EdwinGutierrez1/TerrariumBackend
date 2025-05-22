@@ -44,26 +44,22 @@ exports.almacenarMuestra = async (req, res) => {
   try {
     // Desestructura los datos necesarios del cuerpo de la solicitud
     const {
-      idMuestra,            
-      tamanoIndividuo,      
+      idMuestra,                
       nombreComun,          
       determinacionCampo,  
       observaciones,        
       numeroColeccion,     
       arbol,              
-      cedula_brigadista,   
     } = req.body;
 
     // Construye el objeto de muestra con los datos recibidos
     const muestra = {
       idMuestra,
-      tamanoIndividuo,
       nombreComun,
       determinacionCampo,
       observaciones,
       numeroColeccion,
       arbol,
-      cedula_brigadista,
     };
 
     // Llama al servicio para almacenar la muestra en la base de datos

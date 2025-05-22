@@ -47,13 +47,11 @@ exports.almacenarMuestra = async (muestra) => {
     // Se crea un objeto con los campos necesarios para la base de datos, mapeando desde el objeto muestra original a la estructura esperada por la tabla
     const muestraData = {
       id: muestra.idMuestra,                      
-      tamaño_individuo: muestra.tamanoIndividuo,  
       nombre_comun: muestra.nombreComun,          
       determinacion: muestra.determinacionCampo,  
       observaciones: muestra.observaciones,       
       num_coleccion: muestra.numeroColeccion,    
       id_arbol: muestra.arbol,                    
-      cedula_brigadista: muestra.cedula_brigadista, 
     };
 
     // Se ejecuta la operación de inserción en la tabla "muestra" de Supabase
