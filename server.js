@@ -15,5 +15,5 @@ if (process.env.NODE_ENV !== 'production') {
   });
 }
 
-// Exportar la app para Vercel
+// Exportar la app para Vercel (debe ser default export)
 module.exports = app;
