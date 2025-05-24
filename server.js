@@ -6,8 +6,14 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 // Definir el puerto del servidor
-// Si no se encuentra el puerto en las variables de entorno, se usará el puerto 5000 por defecto
 const PORT = process.env.PORT || 5000;
 
-// Iniciar el servidor
-app.listen(PORT);
+// Solo ejecutar listen en desarrollo local, no en Vercel
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
+  });
+}
+
+// Exportar la app para Vercel
+module.exports = app;

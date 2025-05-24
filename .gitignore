@@ -1,4 +1,3 @@
-
 # Se ignoran archivos que contienen credenciales o configuraciones sensibles.
 # Esto ayuda a proteger información privada y mantener la seguridad del proyecto.
 # No bastará con clonar el repositorio para que el proyecto funcione, será necesario incluir denuevo estos archivos
@@ -19,3 +18,5 @@ npm-debug.log*
 
 # Directorios de dependencias
 .npm
+
+.vercel
